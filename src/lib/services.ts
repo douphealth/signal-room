@@ -57,7 +57,8 @@ export function componentLevel(s: string): Level {
   }
 }
 
-export interface Reading { ok: boolean; fetchedAt: string; updatedAt?: string; indicator?: string; description?: string; components: { name: string; status: string }[]; incidents: { id: string; name: string; impact: string; status: string; updatedAt: string; link: string }[]; error?: string; }
+export interface Incident { id: string; name: string; impact: string; status: string; updatedAt: string; startsAt?: string; endsAt?: string; link: string; latest?: string; affected: string[] }
+export interface Reading { ok: boolean; fetchedAt: string; updatedAt?: string; indicator?: string; description?: string; components: { name: string; status: string }[]; incidents: Incident[]; maintenances: Incident[]; ms?: number; error?: string; }
 
 export function serviceLevel(svc: Service, r?: Reading): { level: Level; matched: { name: string; status: string }[] } {
   if (!r || !r.ok) return { level: "unknown", matched: [] };
