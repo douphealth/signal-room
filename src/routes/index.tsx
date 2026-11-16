@@ -72,12 +72,12 @@ function Index() {
 
   const healthy = counts.operational, total = rows.length, pct = Math.round((healthy / total) * 100);
   const worst = rows.reduce<Level>((w, r) => (LEVEL_RANK[r.level] > LEVEL_RANK[w] && r.level !== "unknown" ? r.level : w), "operational");
-  const incidents = Object.entries(readings).flatMap(([k, r]) => r.incidents.map((i) => ({ ...i, src: SOURCES[k].label }))).sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
+  const incidents = Object.entries(readings).flatMap(([k, r]) => r.incidents.map((i) => ({ ...i, src: SOURCES[k]!.label }))).sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
   const progress = Math.min(1, (now - dataUpdatedAt) / REFRESH);
   const sourcesOk = Object.values(readings).filter((r) => r.ok).length;
 
   const exportCsv = () => {
-    const lines = [["service", "category", "status", "source", "fetched_at"], ...rows.map((r) => [r.s.name, r.s.category, r.level, SOURCES[r.s.source].page, readings[r.s.source]?.fetchedAt ?? ""])];
+    const lines = [["service", "category", "status", "source", "fetched_at"], ...rows.map((r) => [r.s.name, r.s.category, r.level, SOURCES[r.s.source]?.page ?? "", readings[r.s.source]?.fetchedAt ?? ""])];
     const blob = new Blob([lines.map((l) => l.map((v) => `"${v}"`).join(",")).join("\n")], { type: "text/csv" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `signalroom-${new Date().toISOString().slice(0, 16)}.csv`; a.click();
   };
@@ -207,13 +207,13 @@ function Index() {
   );
 }
 
-function Detail({ s, r, onClose, watched, onWatch }: { s: Service; r?: Reading; onClose: () => void; watched: boolean; onWatch: () => void }) {
+function Detail({ s, r, onClose, watched, onWatch }: { s: Service; r: Reading | undefined; onClose: () => void; watched: boolean; onWatch: () => void }) {
   const { level, matched } = serviceLevel(s, r);
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-background/60 backdrop-blur-sm" onClick={onClose}>
       <aside onClick={(e) => e.stopPropagation()} className="h-full w-full max-w-md overflow-y-auto border-l border-border bg-popover p-6 shadow-2xl animate-in slide-in-from-right duration-300">
         <div className="flex items-center justify-between">
-          <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{s.category} · {SOURCES[s.source].label}</span>
+          <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">{s.category} · {SOURCES[s.source]!.label}</span>
           <button onClick={onClose} className="rounded-full border border-border px-2.5 py-1 text-sm text-muted-foreground hover:text-foreground">Esc</button>
         </div>
         <h2 className="mt-4 text-3xl font-bold">{s.name}</h2>
@@ -229,7 +229,7 @@ function Detail({ s, r, onClose, watched, onWatch }: { s: Service; r?: Reading; 
         {r && r.incidents.length > 0 && <><h3 className="mt-6 font-semibold">Open incidents</h3>{r.incidents.map((i) => <a key={i.id} href={i.link} target="_blank" rel="noreferrer" className="mt-2 block rounded-xl border border-border p-3 text-sm hover:border-primary">{i.name}<span className="block font-mono text-[11px] text-muted-foreground">{i.impact} · {i.status} · {ago(i.updatedAt)}</span></a>)}</>}
         <div className="mt-6 flex gap-2">
           <button onClick={onWatch} className="flex-1 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground">{watched ? "★ Watching" : "☆ Add to watchlist"}</button>
-          <a href={SOURCES[s.source].page} target="_blank" rel="noreferrer" className="flex-1 rounded-full border border-border px-4 py-2.5 text-center text-sm">Official page ↗</a>
+          <a href={SOURCES[s.source]!.page} target="_blank" rel="noreferrer" className="flex-1 rounded-full border border-border px-4 py-2.5 text-center text-sm">Official page ↗</a>
         </div>
         <p className="mt-4 font-mono text-[11px] text-muted-foreground">Fetched {ago(r?.fetchedAt)} · provider updated {ago(r?.updatedAt)}</p>
       </aside>
