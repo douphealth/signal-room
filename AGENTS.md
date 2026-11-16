@@ -28,3 +28,5 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- Service catalogue and status-level logic live in src/lib/services.ts; status feeds are fetched only server-side via src/lib/status.functions.ts (avoids CORS, enables caching).

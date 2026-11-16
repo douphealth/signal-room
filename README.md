@@ -1,29 +1,27 @@
-# Welcome to your Lovable project
+# Signalroom
 
-This project was built with [Lovable](https://lovable.dev).
+A source-first status desk for the tools you depend on — OpenAI, Claude, GitHub, Cloudflare, Vercel, Supabase, Notion, Figma, Shopify and more.
 
-## Build with Lovable
+## Features
+- **Official evidence only** — readings come from each provider's public `summary.json` status feed. No synthetic probes.
+- **Component-level scoping** — e.g. *Claude Code* and *GitHub Actions* track only their own published components.
+- **Live board** — auto-refresh every 60s with a countdown, fleet-health meter, severity-sorted cards.
+- **Active incidents feed** linking straight to provider postmortems.
+- **Private watchlist** stored in your browser; **CSV export**; keyboard shortcuts (`/` `r` `i` `w` `Esc`).
+- **Detail drawer** with component breakdown and practical "before you blame the provider" triage tips.
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+## Stack
+TanStack Start (React 19, SSR) · Tailwind CSS v4 · TanStack Query · runs on Cloudflare Workers.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+Server-side fetching (`src/lib/status.functions.ts`) avoids CORS and caches readings for 45s.
 
-## Development
+## Adding a service
+Add the provider to `SOURCES` and an entry to `SERVICES` in `src/lib/services.ts`. Use `components` to scope to exact component names from the provider's feed.
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+## Develop
+```bash
+bun install
+bun run dev
 ```
 
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+_Independent project, not affiliated with any listed provider._
