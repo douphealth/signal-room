@@ -154,11 +154,11 @@ function Index() {
             <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded border border-border px-1.5 font-mono text-[10px] text-muted-foreground">/</kbd>
           </div>
           <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 lg:mx-0 lg:px-0 lg:pb-0 [scrollbar-width:none]">
-          {CATS.map((c) => <button key={c} onClick={() => setCat(c)} className={`shrink-0 rounded-full px-3 py-1.5 text-sm transition ${cat === c ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground hover:text-foreground"}`}>{c}</button>)}
-          <button onClick={() => setOnlyIssues((v) => !v)} className={`shrink-0 rounded-full px-3 py-1.5 text-sm ${onlyIssues ? "bg-warn text-primary-foreground" : "border border-border text-muted-foreground"}`}>Issues only</button>
-          <button onClick={() => setOnlyWatch((v) => !v)} className={`shrink-0 rounded-full px-3 py-1.5 text-sm ${onlyWatch ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"}`}>★ Watchlist {watch.length > 0 && `(${watch.length})`}</button>
+          {CATS.map((c) => <button key={c} onClick={() => setCat(c)} className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${cat === c ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground hover:text-foreground"}`}>{c}</button>)}
+          <button onClick={() => setOnlyIssues((v) => !v)} className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm ${onlyIssues ? "bg-warn text-primary-foreground" : "border border-border text-muted-foreground"}`}>Issues only</button>
+          <button onClick={() => setOnlyWatch((v) => !v)} className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm ${onlyWatch ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"}`}>★ Watchlist {watch.length > 0 && `(${watch.length})`}</button>
           <button onClick={exportCsv} className="rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground">Export CSV</button>
-          <button onClick={enableNotify} className={`shrink-0 rounded-full px-3 py-1.5 text-sm ${notify ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground hover:text-foreground"}`}>{notify ? "🔔 Alerts on" : "🔔 Alert me"}</button>
+          <button onClick={enableNotify} className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm ${notify ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground hover:text-foreground"}`}>{notify ? "🔔 Alerts on" : "🔔 Alert me"}</button>
           </div>
         </div>
 
