@@ -36,6 +36,8 @@ export const getReadings = createServerFn({ method: "GET" }).handler(async () =>
   if (cache && Date.now() - cache.at < 45_000) return cache.data;
   const entries = await Promise.all(Object.entries(SOURCES).map(async ([k, s]) => [k, await fetchOne(s.url)] as const));
   const data = Object.fromEntries(entries) as Record<string, Reading>;
+  // Keep last good reading (flagged stale) if a feed blips, instead of blanking the service.
+  if (cache) for (const k of Object.keys(data)) { const prev = cache.data[k]; if (!data[k]!.ok && prev?.ok) data[k] = { ...prev, stale: true, error: data[k]!.error } as Reading; }
   cache = { at: Date.now(), data };
   return data;
 });
