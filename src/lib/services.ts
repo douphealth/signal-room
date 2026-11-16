@@ -57,7 +57,8 @@ export function componentLevel(s: string): Level {
   }
 }
 
-export interface Reading { ok: boolean; fetchedAt: string; updatedAt?: string; indicator?: string; description?: string; components: { name: string; status: string }[]; incidents: { id: string; name: string; impact: string; status: string; updatedAt: string; link: string }[]; error?: string; }
+export interface Incident { id: string; name: string; impact: string; status: string; updatedAt: string; startsAt?: string; endsAt?: string; link: string; latest?: string; affected: string[] }
+export interface Reading { ok: boolean; fetchedAt: string; updatedAt?: string; indicator?: string; description?: string; components: { name: string; status: string }[]; incidents: Incident[]; maintenances: Incident[]; ms?: number; stale?: boolean; error?: string; }
 
 export function serviceLevel(svc: Service, r?: Reading): { level: Level; matched: { name: string; status: string }[] } {
   if (!r || !r.ok) return { level: "unknown", matched: [] };
@@ -67,4 +68,10 @@ export function serviceLevel(svc: Service, r?: Reading): { level: Level; matched
   for (const c of matched) { const l = componentLevel(c.status); if (LEVEL_RANK[l] > LEVEL_RANK[level]) level = l; }
   if (!svc.components && r.indicator === "major" && LEVEL_RANK[level] < 5) level = "major";
   return { level, matched };
+}
+
+/** Incidents whose affected components overlap this service (or all, for whole-provider services). */
+export function relevantIncidents(svc: Service, list: Incident[]): Incident[] {
+  if (!svc.components) return list;
+  return list.filter((i) => i.affected.length === 0 || i.affected.some((a) => svc.components!.includes(a)));
 }
