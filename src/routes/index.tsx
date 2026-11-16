@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getReadings } from "@/lib/status.functions";
-import { SERVICES, SOURCES, LEVEL_LABEL, LEVEL_RANK, componentLevel, serviceLevel, relevantIncidents, type Level, type Category, type Service, type Reading, type Incident } from "@/lib/services";
+import { SERVICES, SOURCES, LEVEL_LABEL, LEVEL_RANK, componentLevel, serviceLevel, relevantIncidents, type Level, type Category, type Service, type Reading } from "@/lib/services";
 
 const REFRESH = 60_000;
 const readingsQuery = queryOptions({ queryKey: ["readings"], queryFn: () => getReadings(), refetchInterval: REFRESH, staleTime: 30_000 });
