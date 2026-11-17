@@ -1,5 +1,8 @@
 # Signalroom improvement roadmap
 
+- [x] Expand popular-service coverage using verified official feeds and exact product components (68 services across 43 providers).
+- [x] Verify expanded watchlist selection, live readings, and catalogue regression tests (57 tests; desktop/mobile watchlist reload verified).
+
 - [x] Fix exact incident links and maintenance date fallbacks, with tests.
 - [x] Keep card status, relevant incidents, and timestamps consistent.
 - [x] Group regional maintenance without losing exact source links.

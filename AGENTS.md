@@ -30,3 +30,5 @@ use the editor.
 <!-- LOVABLE:END -->
 
 - Service catalogue and status-level logic live in src/lib/services.ts; status feeds are fetched only server-side via src/lib/status.functions.ts (avoids CORS, enables caching).
+- Verify new provider summary feeds and exact scoped component names before listing them; catalogue tests retain published component fixtures to catch unsupported mappings.
+- Aggregate provider feeds through six reusable fetch slots so growing coverage does not stall behind batch boundaries or exceed the runtime connection budget.

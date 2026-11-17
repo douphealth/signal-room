@@ -68,18 +68,23 @@ async function fetchOne(source: { url: string; page: string }): Promise<Reading>
 async function loadReadings(): Promise<Record<string, Reading>> {
   const entries: (readonly [string, Reading])[] = [];
   const sources = Object.entries(SOURCES);
-  // The Worker runtime permits six outbound requests at once; chunking avoids hidden queues.
-  for (let offset = 0; offset < sources.length; offset += 6) {
-    const chunk = await Promise.all(sources.slice(offset, offset + 6).map(async ([key, source]) => [key, await fetchOne(source)] as const));
-    entries.push(...chunk);
-  }
+  // Six reusable slots keep fast feeds moving without waiting for the slowest in a batch.
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.min(6, sources.length) }, async () => {
+    while (next < sources.length) {
+      const entry = sources[next++];
+      if (!entry) return;
+      const [key, source] = entry;
+      entries.push([key, await fetchOne(source)]);
+    }
+  }));
   const data = Object.fromEntries(entries) as Record<string, Reading>;
   // Keep the last good reading (clearly flagged) if a feed blips instead of blanking its services.
   if (cache) {
     for (const key of Object.keys(data)) {
       const previous = cache.data[key];
-      if (!data[key]!.ok && previous?.ok) {
-        const failed = data[key]!;
+      const failed = data[key];
+      if (failed && !failed.ok && previous?.ok) {
         const stale: Reading = { ...previous, stale: true, lastAttemptAt: failed.lastAttemptAt ?? failed.fetchedAt };
         if (failed.error) stale.error = failed.error;
         if (failed.httpStatus == null) delete stale.httpStatus;
