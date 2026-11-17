@@ -15,7 +15,6 @@ function inc(i: any, page: string): Incident {
     name: clip(i.name),
     impact: String(i.impact ?? "none"),
     status: String(i.status),
-    createdAt: i.created_at ? String(i.created_at) : undefined,
     updatedAt: String(i.updated_at ?? i.created_at ?? new Date().toISOString()),
     link: incidentUrl(page, id, i.shortlink),
     affected: (i.components ?? []).map((c: any) => String(c.name)).slice(0, 16),

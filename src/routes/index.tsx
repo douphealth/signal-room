@@ -129,7 +129,9 @@ function Index() {
   const [now, setNow] = useState(0);
   const [notify, setNotify] = useState(false);
   const prevLevels = useRef<Record<string, Level>>({});
-  const clock = now || dataUpdatedAt;
+  const initialClock = Math.max(0, ...Object.values(readings).map((reading) => Date.parse(reading.fetchedAt)));
+  const clock = now || initialClock;
+  const refreshClock = now ? dataUpdatedAt : initialClock;
   const hydrated = now > 0;
 
   useEffect(() => {

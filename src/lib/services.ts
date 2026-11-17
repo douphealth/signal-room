@@ -111,8 +111,8 @@ export function parseMaintenanceWindow(text: string, referenceIso: string): { st
   const reference = Date.parse(referenceIso);
   if (!Number.isFinite(reference)) return {};
   let year = Number(isoDate?.[1] ?? namedDate?.[3] ?? new Date(reference).getUTCFullYear());
-  const month = isoDate ? Number(isoDate[1]) - 1 : MONTHS[namedDate![1]!.toLowerCase()]!;
-  const day = Number(isoDate?.[2] ?? namedDate![2]);
+  const month = isoDate ? Number(isoDate[2]) - 1 : MONTHS[namedDate![1]!.toLowerCase()]!;
+  const day = Number(isoDate?.[3] ?? namedDate![2]);
   const explicitYear = Boolean(isoDate || namedDate?.[3]);
   const makeStart = (y: number) => Date.UTC(y, month, day, Number(time[1]), Number(time[2]));
   let startMs = makeStart(year);
