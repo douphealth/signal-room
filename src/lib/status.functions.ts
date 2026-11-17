@@ -35,6 +35,17 @@ function inc(i: any, page: string): Incident {
   return out;
 }
 
+function normalizeComponents(input: any): { name: string; status: string }[] {
+  const components = new Map<string, { name: string; status: string }>();
+  for (const raw of Array.isArray(input) ? input : []) {
+    if (raw?.group) continue;
+    const component = { name: String(raw.name), status: String(raw.status) };
+    const previous = components.get(component.name);
+    if (!previous || LEVEL_RANK[componentLevel(component.status)] > LEVEL_RANK[componentLevel(previous.status)]) components.set(component.name, component);
+  }
+  return [...components.values()];
+}
+
 async function fetchOne(source: { url: string; page: string }): Promise<Reading> {
   const fetchedAt = new Date().toISOString();
   const t0 = Date.now();
