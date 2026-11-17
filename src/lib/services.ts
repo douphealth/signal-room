@@ -17,6 +17,8 @@ export const SOURCES: Record<string, { url: string; page: string; label: string 
   digitalocean: { label: "DigitalOcean", url: "https://status.digitalocean.com/api/v2/summary.json", page: "https://status.digitalocean.com/" },
 };
 
+export const FEED_FORMAT = "Statuspage JSON · /api/v2/summary.json";
+
 export const SERVICES: Service[] = [
   { id: "openai-api", name: "OpenAI API", category: "AI", mark: "OA", source: "openai", components: ["Chat Completions","Responses","Agents","Fine-tuning","Embeddings","Images","Batch","Audio","Moderations","Realtime","Files"], note: "Model endpoints and developer workflows", tip: "Check which endpoint and model returned the error. Compare status codes and request IDs before retrying." },
   { id: "chatgpt", name: "ChatGPT", category: "AI", mark: "CG", source: "openai", components: ["Conversations","GPTs","Voice mode","Deep Research","Image Generation","Search","File uploads"], note: "Conversations, files, search and features", tip: "Check whether the problem affects one conversation, one device, or the whole app. Avoid re-sending delayed requests." },
@@ -57,8 +59,22 @@ export function componentLevel(s: string): Level {
   }
 }
 
-export interface Incident { id: string; name: string; impact: string; status: string; updatedAt: string; startsAt?: string; endsAt?: string; link: string; latest?: string; affected: string[] }
-export interface Reading { ok: boolean; fetchedAt: string; updatedAt?: string; indicator?: string; description?: string; components: { name: string; status: string }[]; incidents: Incident[]; maintenances: Incident[]; ms?: number; stale?: boolean; error?: string; }
+export interface Incident { id: string; name: string; impact: string; status: string; updatedAt: string; createdAt?: string; startsAt?: string; endsAt?: string; link: string; latest?: string; affected: string[] }
+export interface Reading { ok: boolean; fetchedAt: string; lastAttemptAt?: string; updatedAt?: string; indicator?: string; description?: string; httpStatus?: number; components: { name: string; status: string }[]; incidents: Incident[]; maintenances: Incident[]; ms?: number; stale?: boolean; error?: string; }
+export interface SourceIncident extends Incident { src: string }
+export interface MaintenanceGroup { key: string; src: string; day: string; items: SourceIncident[] }
+
+export function incidentUrl(page: string, id: string, shortlink?: unknown): string {
+  if (typeof shortlink === "string" && /^https:\/\//i.test(shortlink)) return shortlink;
+  return `${page.replace(/\/+$/, "")}/incidents/${encodeURIComponent(id)}`;
+}
+
+export function incidentLevel(impact: string): Level {
+  if (impact === "critical" || impact === "major") return "major";
+  if (impact === "minor") return "degraded";
+  if (impact === "maintenance") return "maintenance";
+  return "operational";
+}
 
 export function serviceLevel(svc: Service, r?: Reading): { level: Level; matched: { name: string; status: string }[] } {
   if (!r || !r.ok) return { level: "unknown", matched: [] };
@@ -67,11 +83,60 @@ export function serviceLevel(svc: Service, r?: Reading): { level: Level; matched
   let level: Level = "operational";
   for (const c of matched) { const l = componentLevel(c.status); if (LEVEL_RANK[l] > LEVEL_RANK[level]) level = l; }
   if (!svc.components && r.indicator === "major" && LEVEL_RANK[level] < 5) level = "major";
+  for (const incident of relevantIncidents(svc, r.incidents)) {
+    const l = incidentLevel(incident.impact);
+    if (LEVEL_RANK[l] > LEVEL_RANK[level]) level = l;
+  }
   return { level, matched };
 }
 
-/** Incidents whose affected components overlap this service (or all, for whole-provider services). */
+/** Incidents whose published affected components overlap this service.
+ * Scoped services never inherit an incident with missing component metadata:
+ * an ambiguous provider incident remains visible in the global incident feed.
+ */
 export function relevantIncidents(svc: Service, list: Incident[]): Incident[] {
   if (!svc.components) return list;
-  return list.filter((i) => i.affected.length === 0 || i.affected.some((a) => svc.components!.includes(a)));
+  return list.filter((i) => i.affected.some((a) => svc.components!.includes(a)));
+}
+
+const MONTHS: Record<string, number> = { january: 0, february: 1, march: 2, april: 3, may: 4, june: 5, july: 6, august: 7, september: 8, october: 9, november: 10, december: 11 };
+
+/** Parse a UTC maintenance window from provider prose when structured fields are absent. */
+export function parseMaintenanceWindow(text: string, referenceIso: string): { startsAt?: string; endsAt?: string } {
+  const isoDate = text.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+  const namedDate = text.match(/\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2})(?:,\s*(\d{4}))?\b/i);
+  const time = text.match(/\b(?:from|between)\s+([01]?\d|2[0-3]):([0-5]\d)(?:\s*UTC)?\s*(?:to|and|[-–—])\s*([01]?\d|2[0-3]):([0-5]\d)\s*UTC\b/i);
+  if ((!isoDate && !namedDate) || !time) return {};
+
+  const reference = Date.parse(referenceIso);
+  if (!Number.isFinite(reference)) return {};
+  let year = Number(isoDate?.[1] ?? namedDate?.[3] ?? new Date(reference).getUTCFullYear());
+  const month = isoDate ? Number(isoDate[2]) - 1 : MONTHS[namedDate![1]!.toLowerCase()]!;
+  const day = Number(isoDate?.[3] ?? namedDate![2]);
+  const explicitYear = Boolean(isoDate || namedDate?.[3]);
+  const makeStart = (y: number) => Date.UTC(y, month, day, Number(time[1]), Number(time[2]));
+  let startMs = makeStart(year);
+  const valid = new Date(startMs).getUTCMonth() === month && new Date(startMs).getUTCDate() === day;
+  if (!valid) return {};
+  if (!explicitYear && startMs < reference - 2 * 86_400_000) startMs = makeStart(++year);
+  let endMs = Date.UTC(year, month, day, Number(time[3]), Number(time[4]));
+  if (endMs <= startMs) endMs += 86_400_000;
+  return { startsAt: new Date(startMs).toISOString(), endsAt: new Date(endMs).toISOString() };
+}
+
+/** Remove duplicate regional announcements and group the rest by provider and UTC day. */
+export function groupMaintenances(list: SourceIncident[]): MaintenanceGroup[] {
+  const groups = new Map<string, MaintenanceGroup>();
+  const seen = new Set<string>();
+  for (const item of list) {
+    const signature = `${item.src}|${item.name.trim().toLowerCase()}|${item.startsAt ?? ""}|${item.endsAt ?? ""}`;
+    if (seen.has(signature)) continue;
+    seen.add(signature);
+    const day = (item.startsAt ?? item.updatedAt).slice(0, 10);
+    const key = `${item.src}|${day}`;
+    const group = groups.get(key) ?? { key, src: item.src, day, items: [] };
+    group.items.push(item);
+    groups.set(key, group);
+  }
+  return [...groups.values()];
 }
