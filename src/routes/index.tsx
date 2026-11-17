@@ -1,42 +1,28 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Command } from "cmdk";
 import {
-  Activity, AlertTriangle, ArrowUpRight, Bell, Check, ChevronDown, Clock3,
+  AlertTriangle, ArrowUpRight, Bell, Check, ChevronDown, Clock3,
   Command as CommandIcon, Copy, Download, FileJson, FileSpreadsheet, LayoutGrid,
   List, Radio, RefreshCw, Search, Share2, ShieldCheck, Star, X,
 } from "lucide-react";
-import {
-  siAnthropic, siCanva, siCloudflare, siDigitalocean, siDiscord, siFigma,
-  siGithub, siNotion, siOpenai, siRender, siShopify, siSupabase, siVercel,
-  siDeepgram, siNetlify, siFlydotio, siPlanetscale, siUpstash, siClerk,
-  siSentry, siNpm, siDocker, siCircleci, siBitbucket, siLinear, siJira,
-  siConfluence, siTrello, siAsana, siZoom, siDropbox, siTwilio, siResend,
-  siMailgun, siCloudinary, siWebflow, siZapier, siMongodb, siReddit, siReplit,
-} from "simple-icons";
 import { toast } from "sonner";
-import { getReadings } from "@/lib/status.functions";
+import { ServiceIcon } from "@/components/service-icon";
+import { REFRESH, readingsQuery } from "@/lib/readings";
 import {
   SERVICES, SOURCES, LEVEL_LABEL, LEVEL_RANK, FEED_FORMAT, componentLevel,
   serviceLevel, relevantIncidents, groupMaintenances, type Level, type Category,
   type Service, type Reading, type SourceIncident,
 } from "@/lib/services";
-
-const REFRESH = 60_000;
-const readingsQuery = queryOptions({ queryKey: ["readings"], queryFn: () => getReadings(), refetchInterval: REFRESH, staleTime: 30_000 });
+import { HOME_DESCRIPTION, HOME_TITLE, homeCanonical, homePageMeta, isEmptyWatch, servicePath } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Signalroom — Live status board for AI, dev & SaaS tools" },
-      { name: "description", content: "Source-first status desk: official readings for OpenAI, Claude, GitHub, Cloudflare, Vercel, Supabase and more, with a private watchlist." },
-      { property: "og:title", content: "Signalroom — Live status board" },
-      { property: "og:description", content: "Official provider status readings, a private watchlist and the evidence behind every signal." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  beforeLoad: ({ search }) => {
+    if (isEmptyWatch(search)) throw redirect({ to: "/" });
+  },
+  head: ({ match }) => homePageMeta(match.search),
+  headers: ({ match }) => ({ "X-Robots-Tag": homeCanonical(match.search).robots }),
   loader: ({ context }) => context.queryClient.ensureQueryData(readingsQuery),
   component: Index,
 });
@@ -45,28 +31,6 @@ const DOT: Record<Level, string> = { operational: "bg-ok text-ok", degraded: "bg
 const TXT: Record<Level, string> = { operational: "text-ok", degraded: "text-warn", partial: "text-partial", major: "text-major", maintenance: "text-maint", unknown: "text-unknown" };
 const PILL: Record<Level, string> = { operational: "border-ok/20 bg-ok/10", degraded: "border-warn/25 bg-warn/10", partial: "border-partial/25 bg-partial/10", major: "border-major/25 bg-major/10", maintenance: "border-maint/25 bg-maint/10", unknown: "border-border bg-muted" };
 const CATS: ("All" | Category)[] = ["All", "AI", "Developer", "Design", "Work", "Commerce"];
-const ICONS: Record<string, { path: string }> = {
-  openai: siOpenai, claude: siAnthropic, cloudflare: siCloudflare, notion: siNotion,
-  figma: siFigma, canva: siCanva, shopify: siShopify, github: siGithub,
-  vercel: siVercel, supabase: siSupabase, discord: siDiscord, render: siRender,
-  digitalocean: siDigitalocean,
-  deepgram: siDeepgram, netlify: siNetlify, flyio: siFlydotio,
-  planetscale: siPlanetscale, upstash: siUpstash, clerk: siClerk,
-  sentry: siSentry, npm: siNpm, docker: siDocker, circleci: siCircleci,
-  bitbucket: siBitbucket, linear: siLinear, jira: siJira, confluence: siConfluence,
-  trello: siTrello, asana: siAsana, zoom: siZoom, dropbox: siDropbox,
-  twilio: siTwilio, resend: siResend, mailgun: siMailgun, cloudinary: siCloudinary,
-  webflow: siWebflow, zapier: siZapier, mongodb: siMongodb, reddit: siReddit,
-  replit: siReplit,
-};
-
-function ServiceIcon({ source, className = "h-5 w-5" }: { source: string; className?: string }) {
-  const icon = ICONS[source];
-  return icon
-    ? <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}><path d={icon.path} /></svg>
-    : <Activity aria-hidden="true" className={className} />;
-}
-
 function total0(rows: { level: Level }[]) { return rows.filter((r) => r.level !== "operational" && r.level !== "unknown").length; }
 function fmt(iso: string | undefined, local = true) {
   if (!iso || !Number.isFinite(Date.parse(iso))) return "Time not published";
@@ -222,7 +186,7 @@ function Index() {
   }, [readings]);
 
   const issues = total0(rows);
-  useEffect(() => { document.title = issues ? `(${issues}) Signalroom — ${issues} service${issues > 1 ? "s" : ""} affected` : "Signalroom — all signals clear"; }, [issues]);
+  useEffect(() => { document.title = issues ? `(${issues}) ${HOME_TITLE}` : HOME_TITLE; }, [issues]);
 
   useEffect(() => {
     for (const row of rows) {
@@ -301,6 +265,7 @@ function Index() {
           </a>
           <nav className="hidden items-center gap-5 text-sm text-muted-foreground lg:flex" aria-label="Main navigation">
             <a href="#board" className="transition hover:text-foreground">Board</a>
+            <a href="/services" className="transition hover:text-foreground">Services</a>
             <a href="#incidents" className="transition hover:text-foreground">Incidents{incidents.length ? ` (${incidents.length})` : ""}</a>
             <a href="#maintenance" className="transition hover:text-foreground">Maintenance</a>
             <a href="#method" className="transition hover:text-foreground">Feed health</a>
@@ -327,7 +292,7 @@ function Index() {
               <h1 className="mt-4 text-4xl font-bold leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">
                 {worst === "operational" ? <>All signals <span className="text-ok">clear.</span></> : <>Some signals <span className={TXT[worst]}>need attention.</span></>}
               </h1>
-              <p className="mt-5 max-w-xl text-base text-muted-foreground md:text-lg">Live readings from the official status feeds of {total} services across {Object.keys(SOURCES).length} providers. No synthetic probes, no guesses — just the evidence, and where it came from.</p>
+              <p className="mt-5 max-w-xl text-base text-muted-foreground md:text-lg">{HOME_DESCRIPTION} Live readings cover {total} services across {Object.keys(SOURCES).length} providers. No synthetic probes — each service links to <a href="/services" className="text-foreground underline decoration-border underline-offset-4 hover:text-primary">its own status page</a>.</p>
               <div className="mt-6 flex flex-wrap gap-2">
                 <button onClick={() => setCommandOpen(true)} className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:-translate-y-0.5 hover:glow"><CommandIcon className="h-4 w-4" /> Find a service <kbd className="font-mono text-[10px] opacity-70">/</kbd></button>
                 <button onClick={shareWatch} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground transition hover:border-primary/50 hover:text-foreground"><Share2 className="h-4 w-4" /> Copy stack link</button>
@@ -378,10 +343,10 @@ function Index() {
               const incident = relevantIncidents(s, reading?.incidents ?? [])[0];
               return <article key={s.id} className={`rise group ${level !== "operational" && level !== "unknown" ? "border-l-4 " + (level === "major" ? "border-l-major" : level === "partial" ? "border-l-partial" : level === "maintenance" ? "border-l-maint" : "border-l-warn") : ""} relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition duration-300 hover:-translate-y-1 hover:border-primary/40 hover:glow`} style={{ animationDelay: `${Math.min(index, 12) * 35}ms` }}>
                 <div className="flex items-start justify-between gap-3">
-                  <button onClick={() => setOpen(s)} className="flex min-w-0 items-center gap-3 text-left" aria-label={`Open ${s.name} details`}>
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-border bg-muted text-muted-foreground transition duration-300 group-hover:border-primary/30 group-hover:text-primary"><ServiceIcon source={s.source} /></span>
-                    <span className="min-w-0"><span className="block truncate font-semibold leading-tight">{s.name}</span><span className="mt-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{s.category} · {SOURCES[s.source]?.label}</span></span>
-                  </button>
+                  <div className="flex min-w-0 items-center gap-3 text-left">
+                    <button onClick={() => setOpen(s)} className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-border bg-muted text-muted-foreground transition duration-300 group-hover:border-primary/30 group-hover:text-primary" aria-label={`Open ${s.name} details`}><ServiceIcon source={s.source} /></button>
+                    <span className="min-w-0"><a href={servicePath(s.id)} className="block truncate font-semibold leading-tight hover:text-primary">{s.name}</a><span className="mt-1 block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{s.category} · {SOURCES[s.source]?.label}</span></span>
+                  </div>
                   <button aria-label={`${watch.includes(s.id) ? "Remove" : "Add"} ${s.name} ${watch.includes(s.id) ? "from" : "to"} watchlist`} aria-pressed={watch.includes(s.id)} onClick={() => toggleWatch(s.id)} className={`rounded-full p-1 transition hover:scale-110 ${watch.includes(s.id) ? "text-primary" : "text-muted-foreground/40 hover:text-foreground"}`}><Star className={`h-5 w-5 ${watch.includes(s.id) ? "fill-current" : ""}`} /></button>
                 </div>
                 <button onClick={() => setOpen(s)} className="mt-4 block min-h-10 w-full text-left text-sm text-muted-foreground">
@@ -405,7 +370,7 @@ function Index() {
                 const reading = readings[s.source];
                 const incident = relevantIncidents(s, reading?.incidents ?? [])[0];
                 return <div key={s.id} className="grid grid-cols-[1fr_auto] items-center gap-3 px-4 py-3 transition hover:bg-accent/50 md:grid-cols-[minmax(220px,1.4fr)_100px_150px_100px_150px_40px] md:gap-4">
-                  <button onClick={() => setOpen(s)} className="flex min-w-0 items-center gap-3 text-left"><ServiceIcon source={s.source} className="h-4 w-4 shrink-0 text-muted-foreground" /><span className="min-w-0"><span className="block truncate text-sm font-medium">{s.name}</span>{incident && <span className="block truncate text-xs text-warn">{incident.name}</span>}</span></button>
+                  <div className="flex min-w-0 items-center gap-3 text-left"><button onClick={() => setOpen(s)} aria-label={`Open ${s.name} details`} className="text-muted-foreground"><ServiceIcon source={s.source} className="h-4 w-4 shrink-0" /></button><span className="min-w-0"><a href={servicePath(s.id)} className="block truncate text-sm font-medium hover:text-primary">{s.name}</a>{incident && <span className="block truncate text-xs text-warn">{incident.name}</span>}</span></div>
                   <span className="hidden font-mono text-[10px] uppercase text-muted-foreground md:block">{s.category}</span>
                   <span className="hidden md:block"><StatusPill level={level} /></span>
                   <span className="hidden font-mono text-xs text-muted-foreground md:block">{matched.length} matched</span>
@@ -485,7 +450,7 @@ function Index() {
 
       <footer className="border-t border-border py-8">
         <div className="mx-auto flex max-w-[90rem] flex-wrap justify-between gap-3 px-4 font-mono text-xs text-muted-foreground sm:px-5">
-          <span>Signalroom · independent, not affiliated with any provider</span>
+          <span className="flex flex-wrap items-center gap-x-4 gap-y-1"><a href="/services" className="underline decoration-border underline-offset-4 hover:text-foreground">Services</a><span>Signalroom · independent, not affiliated with any provider</span></span>
           <span>Shortcuts: <kbd>/</kbd> or <kbd>⌘K</kbd> command · <kbd>r</kbd> refresh · <kbd>i</kbd> issues · <kbd>w</kbd> watchlist · <kbd>n</kbd> NOC</span>
         </div>
       </footer>
