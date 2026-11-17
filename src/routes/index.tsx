@@ -174,13 +174,13 @@ function Index() {
         setCommandOpen((value) => !value);
         return;
       }
+      if (event.key === "Escape") { setOpen(null); setCommandOpen(false); return; }
       if (editing) return;
       if (event.key === "/") { event.preventDefault(); setCommandOpen(true); }
       else if (event.key.toLowerCase() === "r") void refetch();
       else if (event.key.toLowerCase() === "w") setOnlyWatch((value) => !value);
       else if (event.key.toLowerCase() === "i") setOnlyIssues((value) => !value);
       else if (event.key.toLowerCase() === "n") setView((value) => value === "cards" ? "noc" : "cards");
-      else if (event.key === "Escape") { setOpen(null); setCommandOpen(false); }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
