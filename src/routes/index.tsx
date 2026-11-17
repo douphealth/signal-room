@@ -313,7 +313,7 @@ function Index() {
             <div className="rise">
               <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-primary sm:text-xs sm:tracking-[0.25em]"><Radio className="h-3.5 w-3.5" /> Internet status desk · official sources only</div>
               <h1 className="mt-4 text-4xl font-bold leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">
-                {worst === "operational" ? <>All signals <span className="text-ok">clear.</span></> : <>Signals <span className={TXT[worst]}>{LEVEL_LABEL[worst].toLowerCase()}.</span></>}
+                {worst === "operational" ? <>All signals <span className="text-ok">clear.</span></> : <>Some signals <span className={TXT[worst]}>need attention.</span></>}
               </h1>
               <p className="mt-5 max-w-xl text-base text-muted-foreground md:text-lg">Live readings from the official status feeds of {total} services across {Object.keys(SOURCES).length} providers. No synthetic probes, no guesses — just the evidence, and where it came from.</p>
               <div className="mt-6 flex flex-wrap gap-2">
