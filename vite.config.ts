@@ -10,6 +10,10 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  vite: {
+    // SITE_URL overrides the production origin at build time. VITE_ remains the default prefix.
+    envPrefix: ["VITE_", "SITE_URL"],
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
