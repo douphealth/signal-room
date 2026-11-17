@@ -10,6 +10,10 @@ import {
 import {
   siAnthropic, siCanva, siCloudflare, siDigitalocean, siDiscord, siFigma,
   siGithub, siNotion, siOpenai, siRender, siShopify, siSupabase, siVercel,
+  siDeepgram, siNetlify, siFlydotio, siPlanetscale, siUpstash, siClerk,
+  siSentry, siNpm, siDocker, siCircleci, siBitbucket, siLinear, siJira,
+  siConfluence, siTrello, siAsana, siZoom, siDropbox, siTwilio, siResend,
+  siMailgun, siCloudinary, siWebflow, siZapier, siMongodb, siReddit, siReplit,
 } from "simple-icons";
 import { toast } from "sonner";
 import { getReadings } from "@/lib/status.functions";
@@ -46,6 +50,14 @@ const ICONS: Record<string, { path: string }> = {
   figma: siFigma, canva: siCanva, shopify: siShopify, github: siGithub,
   vercel: siVercel, supabase: siSupabase, discord: siDiscord, render: siRender,
   digitalocean: siDigitalocean,
+  deepgram: siDeepgram, netlify: siNetlify, flyio: siFlydotio,
+  planetscale: siPlanetscale, upstash: siUpstash, clerk: siClerk,
+  sentry: siSentry, npm: siNpm, docker: siDocker, circleci: siCircleci,
+  bitbucket: siBitbucket, linear: siLinear, jira: siJira, confluence: siConfluence,
+  trello: siTrello, asana: siAsana, zoom: siZoom, dropbox: siDropbox,
+  twilio: siTwilio, resend: siResend, mailgun: siMailgun, cloudinary: siCloudinary,
+  webflow: siWebflow, zapier: siZapier, mongodb: siMongodb, reddit: siReddit,
+  replit: siReplit,
 };
 
 function ServiceIcon({ source, className = "h-5 w-5" }: { source: string; className?: string }) {
