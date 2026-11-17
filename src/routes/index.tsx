@@ -341,16 +341,16 @@ function Index() {
         </section>
 
         <section id="board" className="mx-auto max-w-[90rem] scroll-mt-32 px-4 sm:px-5">
-          <div className="sticky top-[57px] z-20 -mx-4 flex flex-col gap-2 border-b border-border bg-background/85 px-4 py-3 backdrop-blur-xl sm:-mx-5 sm:px-5 xl:flex-row xl:items-center">
-            <button onClick={() => setCommandOpen(true)} className="flex w-full items-center gap-3 rounded-full border border-input bg-card px-4 py-2 text-left text-sm text-muted-foreground outline-none transition hover:border-primary/60 xl:max-w-sm">
+          <div className="sticky top-[57px] z-20 -mx-4 flex flex-col gap-2 border-b border-border bg-background/85 px-4 py-3 backdrop-blur-xl sm:-mx-5 sm:px-5 2xl:flex-row 2xl:items-center">
+            <button onClick={() => setCommandOpen(true)} className="flex w-full items-center gap-3 rounded-full border border-input bg-card px-4 py-2 text-left text-sm text-muted-foreground outline-none transition hover:border-primary/60 2xl:max-w-sm">
               <Search className="h-4 w-4" /><span className="flex-1">Search services or run a command…</span><kbd className="rounded border border-border px-1.5 font-mono text-[10px]">/</kbd>
             </button>
-            <div className="-mx-4 flex flex-1 gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:-mx-5 sm:px-5 xl:mx-0 xl:px-0 xl:pb-0">
+            <div className="-mx-4 flex flex-1 gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:-mx-5 sm:px-5 2xl:mx-0 2xl:px-0 2xl:pb-0">
               {CATS.map((category) => <button key={category} onClick={() => setCat(category)} className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${cat === category ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground hover:text-foreground"}`}>{category}</button>)}
               <button onClick={() => setOnlyIssues((value) => !value)} className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${onlyIssues ? "bg-warn text-primary-foreground" : "border border-border text-muted-foreground hover:text-foreground"}`}>Issues only</button>
               <button onClick={() => setOnlyWatch((value) => !value)} className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${onlyWatch ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground hover:text-foreground"}`}><Star className={`mr-1 inline h-3.5 w-3.5 ${onlyWatch ? "fill-current" : ""}`} />Watchlist {watch.length > 0 && `(${watch.length})`}</button>
             </div>
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] xl:pb-0">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] 2xl:pb-0">
               <div className="flex shrink-0 rounded-full border border-border p-0.5" aria-label="Board density">
                 <button onClick={() => setView("cards")} className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs transition ${view === "cards" ? "bg-secondary text-foreground" : "text-muted-foreground"}`} aria-pressed={view === "cards"}><LayoutGrid className="h-3.5 w-3.5" />Cards</button>
                 <button onClick={() => setView("noc")} className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs transition ${view === "noc" ? "bg-secondary text-foreground" : "text-muted-foreground"}`} aria-pressed={view === "noc"}><List className="h-3.5 w-3.5" />NOC</button>
