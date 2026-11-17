@@ -9,5 +9,5 @@
 - [x] Add a keyboard command menu and compact/NOC board density.
 - [x] Verify live data, tests, keyboard flows, and desktop/mobile layouts.
 - [ ] Durable 30/90-day history and closed-tab Slack/email alerts require a persistent notification backend; do not simulate them in the UI.
-- [ ] Remove the hosting launch badge through project settings.
+- [ ] Remove the hosting launch badge (blocked: project settings require an editor role on a Pro plan or higher).
 - [ ] Connect a custom domain (blocked until the user supplies a domain name).
