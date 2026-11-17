@@ -1,5 +1,6 @@
-import { createServerFn, setResponseHeader } from "@tanstack/react-start";
-import { SOURCES, incidentUrl, parseMaintenanceWindow, type Reading, type Incident } from "./services";
+import { createServerFn } from "@tanstack/react-start";
+import { setResponseHeader } from "@tanstack/react-start/server";
+import { SOURCES, LEVEL_RANK, componentLevel, incidentUrl, parseMaintenanceWindow, type Reading, type Incident } from "./services";
 
 let cache: { at: number; data: Record<string, Reading> } | null = null;
 let pending: Promise<Record<string, Reading>> | null = null;
@@ -19,6 +20,7 @@ function inc(i: any, page: string): Incident {
     link: incidentUrl(page, id, i.shortlink),
     affected: (i.components ?? []).map((c: any) => String(c.name)).slice(0, 16),
   };
+  if (i.created_at) out.createdAt = String(i.created_at);
   if (u?.body) out.latest = clip(u.body);
   if (i.scheduled_for) out.startsAt = String(i.scheduled_for);
   if (i.scheduled_until) out.endsAt = String(i.scheduled_until);
@@ -66,7 +68,12 @@ async function loadReadings(): Promise<Record<string, Reading>> {
     for (const key of Object.keys(data)) {
       const previous = cache.data[key];
       if (!data[key]!.ok && previous?.ok) {
-        data[key] = { ...previous, stale: true, error: data[key]!.error, lastAttemptAt: data[key]!.lastAttemptAt, httpStatus: data[key]!.httpStatus };
+        const failed = data[key]!;
+        const stale: Reading = { ...previous, stale: true, lastAttemptAt: failed.lastAttemptAt ?? failed.fetchedAt };
+        if (failed.error) stale.error = failed.error;
+        if (failed.httpStatus == null) delete stale.httpStatus;
+        else stale.httpStatus = failed.httpStatus;
+        data[key] = stale;
       }
     }
   }

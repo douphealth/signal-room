@@ -226,7 +226,7 @@ function Index() {
   const total = rows.length;
   const pct = Math.round((healthy / total) * 100);
   const worst = rows.reduce<Level>((current, row) => (LEVEL_RANK[row.level] > LEVEL_RANK[current] && row.level !== "unknown" ? row.level : current), "operational");
-  const progress = Math.min(1, Math.max(0, (clock - dataUpdatedAt) / REFRESH));
+  const progress = Math.min(1, Math.max(0, (clock - refreshClock) / REFRESH));
   const sourcesCurrent = Object.values(readings).filter((reading) => reading.ok && !reading.stale).length;
   const staleCount = Object.values(readings).filter((reading) => reading.stale).length;
 
@@ -299,7 +299,7 @@ function Index() {
             </button>
             <button onClick={() => void refetch()} className="flex items-center gap-2 rounded-full border border-border px-3 py-1.5 font-mono text-xs text-muted-foreground transition hover:border-primary hover:text-foreground" aria-label="Refresh all official status feeds">
               <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
-              <span className="hidden md:inline">{isFetching ? "reading…" : `next in ${Math.max(0, Math.ceil((REFRESH - (clock - dataUpdatedAt)) / 1000))}s`}</span>
+              <span className="hidden md:inline">{isFetching ? "reading…" : `next in ${Math.max(0, Math.ceil((REFRESH - (clock - refreshClock)) / 1000))}s`}</span>
             </button>
           </div>
         </div>
@@ -379,7 +379,7 @@ function Index() {
                   <StatusPill level={level} />
                   {reading?.stale && <span className="rounded-full border border-warn/25 bg-warn/10 px-2 py-0.5 font-mono text-[10px] text-warn">CACHED READING</span>}
                 </div>
-                <div className="mt-4 flex gap-0.5" aria-label={`${matched.length} published components`}>{matched.slice(0, 24).map((component) => <span key={component.name} title={`${component.name}: ${LEVEL_LABEL[componentLevel(component.status)]}`} className={`h-1.5 flex-1 rounded-full ${DOT[componentLevel(component.status)]}`} />)}</div>
+                <div className="mt-4 flex gap-0.5" aria-label={`${matched.length} published components`}>{matched.slice(0, 24).map((component, componentIndex) => <span key={`${component.name}-${componentIndex}`} title={`${component.name}: ${LEVEL_LABEL[componentLevel(component.status)]}`} className={`h-1.5 flex-1 rounded-full ${DOT[componentLevel(component.status)]}`} />)}</div>
                 <div className="mt-3 flex items-center justify-between gap-3 font-mono text-[10px] text-muted-foreground">
                   <span>Synced {ago(reading?.fetchedAt, clock)}</span>
                   <span className="truncate" title={reading?.updatedAt ? `Provider page last changed ${fmt(reading.updatedAt, hydrated)}` : undefined}>{incident ? `Incident ${ago(incident.updatedAt, clock)}` : `${matched.length} comp · Provider ${ago(reading?.updatedAt, clock)}`}</span>
@@ -531,7 +531,7 @@ function Detail({ s, r, now, hydrated, onClose, watched, onWatch, onCopy }: { s:
         <h3 className="mt-6 font-semibold">Matched components ({matched.length})</h3>
         <p className="mt-1 text-xs text-muted-foreground">Only these published parts determine this service’s component reading.</p>
         <ul className="mt-3 divide-y divide-border rounded-xl border border-border">
-          {matched.map((component) => { const componentStatus = componentLevel(component.status); return <li key={component.name} className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm"><span>{component.name}</span><span className={`flex shrink-0 items-center gap-2 ${TXT[componentStatus]}`}><Dot level={componentStatus} size="h-2 w-2" />{LEVEL_LABEL[componentStatus]}</span></li>; })}
+          {matched.map((component, componentIndex) => { const componentStatus = componentLevel(component.status); return <li key={`${component.name}-${componentIndex}`} className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm"><span>{component.name}</span><span className={`flex shrink-0 items-center gap-2 ${TXT[componentStatus]}`}><Dot level={componentStatus} size="h-2 w-2" />{LEVEL_LABEL[componentStatus]}</span></li>; })}
           {matched.length === 0 && <li className="px-4 py-3 text-sm text-muted-foreground">No matching components published.</li>}
         </ul>
         {incidents.length > 0 && <><h3 className="mt-6 font-semibold">Open incidents affecting {s.name}</h3>{incidents.map((incident) => <article key={incident.id} className="mt-2 rounded-xl border border-border p-4 text-sm"><a href={incident.link} target="_blank" rel="noreferrer" className="font-medium hover:text-primary">{incident.name} <ArrowUpRight className="inline h-3.5 w-3.5" /></a>{incident.latest && <p className="mt-2 leading-relaxed text-muted-foreground">{incident.latest}</p>}<p className="mt-2 font-mono text-[11px] text-muted-foreground">{incident.impact} · {incident.status.replaceAll("_", " ")} · updated {ago(incident.updatedAt, now)}</p><button onClick={() => void onCopy({ ...incident, src: SOURCES[s.source]!.label })} className="mt-3 flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"><Copy className="h-3.5 w-3.5" />Copy for Slack</button></article>)}</>}
