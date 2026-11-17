@@ -55,7 +55,7 @@ async function fetchOne(source: { url: string; page: string }): Promise<Reading>
     const j: any = await res.json();
     return {
       ok: true, fetchedAt, lastAttemptAt: fetchedAt, httpStatus: res.status, updatedAt: j.page?.updated_at, indicator: j.status?.indicator, description: j.status?.description,
-      components: (j.components ?? []).filter((c: any) => !c.group).map((c: any) => ({ name: String(c.name), status: String(c.status) })),
+      components: normalizeComponents(j.components),
       incidents: (j.incidents ?? []).slice(0, 12).map((i: any) => inc(i, source.page)),
       maintenances: (j.scheduled_maintenances ?? []).slice(0, 24).map((i: any) => inc(i, source.page)),
       ms: Date.now() - t0,
