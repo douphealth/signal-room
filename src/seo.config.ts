@@ -1,3 +1,5 @@
+import { STATUS_PAGES } from "@/lib/status-pages";
+
 // Site-wide SEO settings used by src/lib/seo-edge.ts, /sitemap.xml and /llms.txt.
 export type SeoPage = { path: string; title: string; section?: string; desc?: string; lastmod?: string };
 
@@ -20,5 +22,6 @@ export const LLMS_NOTES: string[] = [
 export function seoPages(): SeoPage[] {
   return [
     { path: "/", title: "Signalroom — Live status board for AI, dev & SaaS tools", section: "Start here" },
+    ...STATUS_PAGES.map((s) => ({ path: `/status/${s.id}`, title: `Is ${s.name} down? Live ${s.name} status`, section: `${s.category} status`, desc: s.note })),
   ];
 }

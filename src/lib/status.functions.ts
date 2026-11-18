@@ -46,7 +46,7 @@ function normalizeComponents(input: any): { name: string; status: string }[] {
   return [...components.values()];
 }
 
-async function fetchOne(source: { url: string; page: string }): Promise<Reading> {
+export async function fetchOne(source: { url: string; page: string }): Promise<Reading> {
   const fetchedAt = new Date().toISOString();
   const t0 = Date.now();
   try {
@@ -110,3 +110,21 @@ export const getReadings = createServerFn({ method: "GET" }).handler(async () =>
     if (pending === request) pending = null;
   }
 });
+
+const one = new Map<string, { at: number; data: Reading }>();
+/** Single-provider reading for /status/<slug> pages; reuses the board cache when fresh. */
+export const getSourceReading = createServerFn({ method: "GET" })
+  .inputValidator((d: { source: string }) => {
+    if (!d || typeof d.source !== "string" || !Object.hasOwn(SOURCES, d.source)) throw new Error("Unknown source");
+    return d;
+  })
+  .handler(async ({ data }) => {
+    setResponseHeader("Cache-Control", "public, max-age=30, stale-while-revalidate=120");
+    if (cache && Date.now() - cache.at < 45_000 && cache.data[data.source]) return cache.data[data.source]!;
+    const hit = one.get(data.source);
+    if (hit && Date.now() - hit.at < 45_000) return hit.data;
+    const r = await fetchOne(SOURCES[data.source]!);
+    const reading: Reading = !r.ok && hit?.data.ok ? { ...hit.data, stale: true, lastAttemptAt: r.lastAttemptAt ?? r.fetchedAt } : r;
+    one.set(data.source, { at: Date.now(), data: reading });
+    return reading;
+  });

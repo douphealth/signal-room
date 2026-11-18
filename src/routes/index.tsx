@@ -17,6 +17,8 @@ import {
 } from "simple-icons";
 import { toast } from "sonner";
 import { getReadings } from "@/lib/status.functions";
+import { Link } from "@tanstack/react-router";
+import { STATUS_PAGES } from "@/lib/status-pages";
 import {
   SERVICES, SOURCES, LEVEL_LABEL, LEVEL_RANK, FEED_FORMAT, componentLevel,
   serviceLevel, relevantIncidents, groupMaintenances, type Level, type Category,
@@ -480,6 +482,10 @@ function Index() {
             </div>
             <p className="border-t border-border px-5 py-3 text-xs leading-relaxed text-muted-foreground">HTTP status describes Signalroom’s feed fetch, not the provider’s product health. A cached reading always keeps its last successful sync time and is labeled wherever it appears.</p>
           </div>
+        </section>
+        <section className="mx-auto mt-16 max-w-7xl px-5" aria-label="Status pages">
+          <h2 className="text-2xl font-bold tracking-tight">Is it down? Status pages by service</h2>
+          <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3 lg:grid-cols-4">{STATUS_PAGES.map((s) => <Link key={s.id} to="/status/$slug" params={{ slug: s.id }} className="text-muted-foreground hover:text-primary">Is {s.name} down?</Link>)}</div>
         </section>
       </main>
 
