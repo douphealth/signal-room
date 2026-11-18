@@ -1,4 +1,4 @@
-export type Category = "AI" | "Developer" | "Design" | "Work" | "Commerce";
+export type Category = "AI" | "Developer" | "Design" | "Work" | "Commerce" | "Consumer";
 export interface Service { id: string; name: string; category: Category; mark: string; source: string; components?: string[]; note: string; tip: string; }
 
 export const SOURCES: Record<string, { url: string; page: string; label: string }> = {
@@ -45,6 +45,40 @@ export const SOURCES: Record<string, { url: string; page: string; label: string 
   reddit: {"label": "Reddit", "url": "https://www.redditstatus.com/api/v2/summary.json", "page": "https://www.redditstatus.com/"} ,
   pinecone: {"label": "Pinecone", "url": "https://status.pinecone.io/api/v2/summary.json", "page": "https://status.pinecone.io/"} ,
   replit: {"label": "Replit", "url": "https://status.replit.com/api/v2/summary.json", "page": "https://status.replit.com/"} ,
+  perplexity: {"label": "Perplexity", "url": "https://status.perplexity.com/api/v2/summary.json", "page": "https://status.perplexity.com/"} ,
+  mistral: {"label": "Mistral AI", "url": "https://status.mistral.ai/api/v2/summary.json", "page": "https://status.mistral.ai/"} ,
+  groq: {"label": "Groq", "url": "https://groqstatus.com/api/v2/summary.json", "page": "https://groqstatus.com/"} ,
+  cohere: {"label": "Cohere", "url": "https://status.cohere.com/api/v2/summary.json", "page": "https://status.cohere.com/"} ,
+  elevenlabs: {"label": "ElevenLabs", "url": "https://status.elevenlabs.io/api/v2/summary.json", "page": "https://status.elevenlabs.io/"} ,
+  runway: {"label": "Runway", "url": "https://status.runwayml.com/api/v2/summary.json", "page": "https://status.runwayml.com/"} ,
+  lovable: {"label": "Lovable", "url": "https://status.lovable.dev/api/v2/summary.json", "page": "https://status.lovable.dev/"} ,
+  bolt: {"label": "Bolt.new", "url": "https://status.bolt.new/api/v2/summary.json", "page": "https://status.bolt.new/"} ,
+  windsurf: {"label": "Windsurf", "url": "https://status.windsurf.com/api/v2/summary.json", "page": "https://status.windsurf.com/"} ,
+  grammarly: {"label": "Grammarly", "url": "https://status.grammarly.com/api/v2/summary.json", "page": "https://status.grammarly.com/"} ,
+  postman: {"label": "Postman", "url": "https://status.postman.com/api/v2/summary.json", "page": "https://status.postman.com/"} ,
+  newrelic: {"label": "New Relic", "url": "https://status.newrelic.com/api/v2/summary.json", "page": "https://status.newrelic.com/"} ,
+  linode: {"label": "Linode (Akamai)", "url": "https://status.linode.com/api/v2/summary.json", "page": "https://status.linode.com/"} ,
+  godaddy: {"label": "GoDaddy", "url": "https://status.godaddy.com/api/v2/summary.json", "page": "https://status.godaddy.com/"} ,
+  miro: {"label": "Miro", "url": "https://status.miro.com/api/v2/summary.json", "page": "https://status.miro.com/"} ,
+  airtable: {"label": "Airtable", "url": "https://status.airtable.com/api/v2/summary.json", "page": "https://status.airtable.com/"} ,
+  box: {"label": "Box", "url": "https://status.box.com/api/v2/summary.json", "page": "https://status.box.com/"} ,
+  hubspot: {"label": "HubSpot", "url": "https://status.hubspot.com/api/v2/summary.json", "page": "https://status.hubspot.com/"} ,
+  typeform: {"label": "Typeform", "url": "https://status.typeform.com/api/v2/summary.json", "page": "https://status.typeform.com/"} ,
+  instructure: {"label": "Instructure", "url": "https://status.instructure.com/api/v2/summary.json", "page": "https://status.instructure.com/"} ,
+  mailerlite: {"label": "MailerLite", "url": "https://status.mailerlite.com/api/v2/summary.json", "page": "https://status.mailerlite.com/"} ,
+  klaviyo: {"label": "Klaviyo", "url": "https://status.klaviyo.com/api/v2/summary.json", "page": "https://status.klaviyo.com/"} ,
+  coinbase: {"label": "Coinbase", "url": "https://status.coinbase.com/api/v2/summary.json", "page": "https://status.coinbase.com/"} ,
+  kraken: {"label": "Kraken", "url": "https://status.kraken.com/api/v2/summary.json", "page": "https://status.kraken.com/"} ,
+  robinhood: {"label": "Robinhood", "url": "https://status.robinhood.com/api/v2/summary.json", "page": "https://status.robinhood.com/"} ,
+  square: {"label": "Square", "url": "https://www.issquareup.com/api/v2/summary.json", "page": "https://www.issquareup.com/"} ,
+  squarespace: {"label": "Squarespace", "url": "https://status.squarespace.com/api/v2/summary.json", "page": "https://status.squarespace.com/"} ,
+  bigcommerce: {"label": "BigCommerce", "url": "https://status.bigcommerce.com/api/v2/summary.json", "page": "https://status.bigcommerce.com/"} ,
+  patreon: {"label": "Patreon", "url": "https://status.patreon.com/api/v2/summary.json", "page": "https://status.patreon.com/"} ,
+  epicgames: {"label": "Epic Games", "url": "https://status.epicgames.com/api/v2/summary.json", "page": "https://status.epicgames.com/"} ,
+  twitch: {"label": "Twitch", "url": "https://status.twitch.com/api/v2/summary.json", "page": "https://status.twitch.com/"} ,
+  duolingo: {"label": "Duolingo", "url": "https://status.duolingo.com/api/v2/summary.json", "page": "https://status.duolingo.com/"} ,
+  vimeo: {"label": "Vimeo", "url": "https://www.vimeostatus.com/api/v2/summary.json", "page": "https://www.vimeostatus.com/"} ,
+  medium: {"label": "Medium", "url": "https://status.medium.com/api/v2/summary.json", "page": "https://status.medium.com/"} ,
 };
 
 export const FEED_FORMAT = "Statuspage JSON · /api/v2/summary.json";
@@ -118,6 +152,43 @@ export const SERVICES: Service[] = [
   {"id": "webflow-ecommerce", "name": "Webflow Ecommerce", "category": "Commerce", "mark": "WE", "source": "webflow", "components": ["Ecommerce"], "note": "Webflow store and ecommerce operations", "tip": "Check your site and checkout error. Payment-provider failures can be independent."},
   {"id": "pinecone-inference", "name": "Pinecone Inference", "category": "AI", "mark": "PI", "source": "pinecone", "components": ["Inference"], "note": "Hosted embedding and reranking inference", "tip": "Record the model, API response and rate limits; index health is a separate signal."},
   {"id": "replit-agent", "name": "Replit Agent", "category": "AI", "mark": "RE", "source": "replit", "components": ["Replit Agent"], "note": "AI-assisted coding and app generation", "tip": "Check the agent task log and account limits separately from published-app health."},
+  {"id": "perplexity", "name": "Perplexity", "category": "AI", "mark": "PX", "source": "perplexity", "note": "AI answer engine, search and API", "tip": "Compare the web app, mobile app and API separately. Note whether answers fail or only sources are missing."},
+  {"id": "mistral", "name": "Mistral AI", "category": "AI", "mark": "MI", "source": "mistral", "note": "Le Chat and the Mistral model API", "tip": "Separate Le Chat issues from API errors. Record the model name, HTTP status and request time."},
+  {"id": "groq", "name": "Groq", "category": "AI", "mark": "GQ", "source": "groq", "note": "GroqCloud inference API and console", "tip": "Check the model you call and its rate limits. A 429 is a quota limit, not an outage."},
+  {"id": "cohere", "name": "Cohere", "category": "AI", "mark": "CO", "source": "cohere", "note": "Cohere model API, embeddings and rerank", "tip": "Note which endpoint failed (chat, embed or rerank) and keep the request ID."},
+  {"id": "elevenlabs", "name": "ElevenLabs", "category": "AI", "mark": "EL", "source": "elevenlabs", "note": "Text-to-speech, voice and dubbing API", "tip": "Check character quota and the voice or model ID before assuming an outage. Compare web app and API."},
+  {"id": "runway", "name": "Runway", "category": "AI", "mark": "RW", "source": "runway", "note": "AI video generation app and API", "tip": "Separate queue delays from failed generations. Check your plan's credits and concurrency."},
+  {"id": "lovable", "name": "Lovable", "category": "AI", "mark": "LV", "source": "lovable", "note": "AI app builder, editor and hosted previews", "tip": "Distinguish editor or AI generation problems from your app's own build errors and hosting."},
+  {"id": "bolt", "name": "Bolt.new", "category": "AI", "mark": "BO", "source": "bolt", "note": "AI app builder in the browser", "tip": "Try a new project and a hard refresh. Browser extensions and blocked WebContainers can look like outages."},
+  {"id": "windsurf", "name": "Windsurf", "category": "AI", "mark": "WS", "source": "windsurf", "note": "AI code editor, agent and completions", "tip": "Compare completions, chat and agent features. Check sign-in and the editor version."},
+  {"id": "grammarly", "name": "Grammarly", "category": "Work", "mark": "GR", "source": "grammarly", "note": "Writing suggestions in the app, browser extension and add-ins", "tip": "Test grammarly.com directly. If only one site or app fails, the extension or add-in is the likely cause."},
+  {"id": "postman", "name": "Postman", "category": "Developer", "mark": "PM", "source": "postman", "note": "API client, workspaces, monitors and mocks", "tip": "Separate sync and workspace problems from the API you are calling. Check monitor regions."},
+  {"id": "new-relic", "name": "New Relic", "category": "Developer", "mark": "NR", "source": "newrelic", "note": "Observability ingest, alerts and dashboards", "tip": "Check your data region (US or EU). Delayed data and failed alerts are reported separately."},
+  {"id": "linode", "name": "Linode (Akamai Cloud)", "category": "Developer", "mark": "LI", "source": "linode", "note": "Compute instances, storage and networking by region", "tip": "Match the affected data center to your instances. One region's incident does not affect the others."},
+  {"id": "godaddy", "name": "GoDaddy", "category": "Commerce", "mark": "GD", "source": "godaddy", "note": "Domains, DNS, hosting and Websites + Marketing", "tip": "DNS changes can take time to propagate. Check whether the domain, DNS or hosting product is affected."},
+  {"id": "miro", "name": "Miro", "category": "Design", "mark": "MR", "source": "miro", "note": "Online whiteboards and collaboration", "tip": "Try another board and a private window. Large boards can be slow without an outage."},
+  {"id": "airtable", "name": "Airtable", "category": "Work", "mark": "AT", "source": "airtable", "note": "Bases, interfaces, automations and API", "tip": "Separate automation or API failures from the web app. Check API rate limits (429)."},
+  {"id": "box", "name": "Box", "category": "Work", "mark": "BX", "source": "box", "note": "Cloud file storage, sharing and Box apps", "tip": "Check whether web, sync (Box Drive) or integrations fail. Permissions can look like an outage."},
+  {"id": "hubspot", "name": "HubSpot", "category": "Work", "mark": "HS", "source": "hubspot", "note": "CRM, marketing, sales and service hubs", "tip": "Note which hub and region are affected. Integrations can fail while the CRM is up."},
+  {"id": "typeform", "name": "Typeform", "category": "Work", "mark": "TF", "source": "typeform", "note": "Forms, responses and integrations", "tip": "Test the public form link separately from the builder and the response integrations."},
+  {"id": "canvas", "name": "Canvas LMS", "category": "Work", "mark": "CV", "source": "instructure", "components": ["Canvas > Canvas LMS", "Canvas > Canvas Mobile", "Canvas > Canvas Studio", "Canvas > Canvas Commons", "Canvas > Canvas Catalog", "Canvas > Canvas Credentials", "Canvas > Canvas Data 2", "Canvas > Canvas Portfolio", "Canvas > Student ePortfolios", "Canvas > Student Pathways", "Canvas > Canvas Career"], "note": "Instructure's learning platform used by schools and universities", "tip": "Your school's own Canvas setup, SSO login or a third-party tool can fail while Canvas itself is up. Ask your school's help desk too."},
+  {"id": "mailerlite", "name": "MailerLite", "category": "Commerce", "mark": "ML", "source": "mailerlite", "note": "Email marketing, automations and sending", "tip": "Check campaign sending and automation queues separately from the dashboard."},
+  {"id": "klaviyo", "name": "Klaviyo", "category": "Commerce", "mark": "KL", "source": "klaviyo", "note": "Email and SMS marketing for online stores", "tip": "Separate sending delays from integration sync (e.g. Shopify) and dashboard issues."},
+  {"id": "coinbase", "name": "Coinbase", "category": "Commerce", "mark": "CB", "source": "coinbase", "note": "Crypto exchange, wallets, payments and API", "tip": "Check which part is affected: website, mobile app, a specific asset, or a payment method. Never share recovery phrases with anyone claiming to be support."},
+  {"id": "kraken", "name": "Kraken", "category": "Commerce", "mark": "KR", "source": "kraken", "note": "Crypto exchange, funding and trading", "tip": "Funding (deposits and withdrawals) is listed per asset and method. Check yours specifically."},
+  {"id": "robinhood", "name": "Robinhood", "category": "Commerce", "mark": "RH", "source": "robinhood", "note": "Trading app, crypto and account services", "tip": "Check whether trading, market data or transfers are affected. Market hours also matter."},
+  {"id": "square", "name": "Square", "category": "Commerce", "mark": "SQ", "source": "square", "note": "Point of sale, payments and Square Online", "tip": "Note whether card processing, the POS app or the dashboard is affected. Keep offline-mode limits in mind."},
+  {"id": "squarespace", "name": "Squarespace", "category": "Commerce", "mark": "SS", "source": "squarespace", "note": "Websites, commerce, domains and email campaigns", "tip": "Check if only the editor or also live sites are affected. Domain DNS issues can look like site outages."},
+  {"id": "bigcommerce", "name": "BigCommerce", "category": "Commerce", "mark": "BC", "source": "bigcommerce", "note": "Online store platform, checkout and APIs", "tip": "Separate storefront, checkout and control panel problems. Third-party apps can break checkout."},
+  {"id": "patreon", "name": "Patreon", "category": "Consumer", "mark": "PT", "source": "patreon", "note": "Creator memberships, posts and payments", "tip": "Separate payment or payout issues from posts and the app. Payment declines are often bank-side."},
+  {"id": "fortnite", "name": "Fortnite", "category": "Consumer", "mark": "FN", "source": "epicgames", "components": ["Fortnite > Website", "Fortnite > Game Services", "Fortnite > Login", "Fortnite > Parties, Friends, and Messaging", "Fortnite > Voice Chat", "Fortnite > Matchmaking", "Fortnite > Stats and Leaderboards", "Fortnite > Item Shop", "Fortnite > Fortnite Crew"], "note": "Fortnite login, matchmaking, game services and Item Shop", "tip": "Check whether login, matchmaking or parties fail. Platform networks (PlayStation, Xbox, Nintendo) have their own outages."},
+  {"id": "epic-games-store", "name": "Epic Games Store", "category": "Consumer", "mark": "EG", "source": "epicgames", "components": ["Epic Games Store > Login", "Epic Games Store > Download/Installation", "Epic Games Store > Purchasing/Refunding", "Epic Games Store > Epic Wallet", "Epic Games Store > Store Browsing", "Epic Games Store > Publishing Tools", "Epic Games Store > Achievements", "Epic Games Store > Game Details"], "note": "Epic Games Store login, downloads and purchases", "tip": "Separate launcher login from downloads and purchases. Restart the launcher before reinstalling games."},
+  {"id": "rocket-league", "name": "Rocket League", "category": "Consumer", "mark": "RL", "source": "epicgames", "components": ["Rocket League > Login", "Rocket League > Website", "Rocket League > Game Services", "Rocket League > Matchmaking", "Rocket League > Stats and Leaderboards", "Rocket League > Item Shop", "Rocket League > Parties, Friends, and Messaging", "Rocket League > Voice Chat"], "note": "Rocket League login, matchmaking and game services", "tip": "Check matchmaking and login separately. Your platform's online service can also be the cause."},
+  {"id": "fall-guys", "name": "Fall Guys", "category": "Consumer", "mark": "FG", "source": "epicgames", "components": ["Fall Guys > Login", "Fall Guys > Matchmaking", "Fall Guys > Voice Chat", "Fall Guys > Parties, Friends, and Messaging", "Fall Guys > Item Shop", "Fall Guys > Website", "Fall Guys > Game Services"], "note": "Fall Guys login, matchmaking and game services", "tip": "Check login, matchmaking and parties separately, and your console network's status."},
+  {"id": "twitch", "name": "Twitch", "category": "Consumer", "mark": "TW", "source": "twitch", "note": "Live streaming: watching, broadcasting, chat and purchases", "tip": "Separate watching, broadcasting and chat. For streamers, also check your encoder and ingest server."},
+  {"id": "duolingo", "name": "Duolingo", "category": "Consumer", "mark": "DL", "source": "duolingo", "note": "Language-learning app and website", "tip": "Compare the app and website. Streak issues during an outage are usually handled by Duolingo support."},
+  {"id": "vimeo", "name": "Vimeo", "category": "Consumer", "mark": "VM", "source": "vimeo", "note": "Video hosting, playback, uploads and live", "tip": "Separate playback, upload and live streaming. Embeds can fail because of the host site."},
+  {"id": "medium", "name": "Medium", "category": "Consumer", "mark": "MD", "source": "medium", "note": "Reading, writing and publishing on Medium", "tip": "Compare reading and the editor. Custom-domain publications can fail on DNS alone."}
 ];
 
 export type Level = "operational" | "degraded" | "partial" | "major" | "maintenance" | "unknown";
@@ -154,7 +225,8 @@ export function incidentLevel(impact: string): Level {
 
 export function serviceLevel(svc: Service, r?: Reading): { level: Level; matched: { name: string; status: string }[] } {
   if (!r || !r.ok) return { level: "unknown", matched: [] };
-  const matched = svc.components ? r.components.filter((c) => svc.components!.includes(c.name)) : r.components;
+  // Unscoped services list plain component names only; "Group > Name" entries exist for scoped products.
+  const matched = svc.components ? r.components.filter((c) => svc.components!.includes(c.name)) : r.components.filter((c) => !c.name.includes(" > "));
   if (svc.components && matched.length === 0) return { level: "unknown", matched };
   let level: Level = "operational";
   for (const c of matched) { const l = componentLevel(c.status); if (LEVEL_RANK[l] > LEVEL_RANK[level]) level = l; }
@@ -170,6 +242,14 @@ export function serviceLevel(svc: Service, r?: Reading): { level: Level; matched
  * Scoped services never inherit an incident with missing component metadata:
  * an ambiguous provider incident remains visible in the global incident feed.
  */
+/** "Fortnite > Login" -> "Login" for display under a product that is already named. */
+export function componentLabel(name: string): string { return name.split(" > ").pop() ?? name; }
+
+/** Affected list for display: prefer "Group > Name" and drop the duplicate plain name. */
+export function displayAffected(list: string[]): string[] {
+  return list.filter((a) => a.includes(" > ") || !list.some((b) => b.endsWith(` > ${a}`)));
+}
+
 export function relevantIncidents(svc: Service, list: Incident[]): Incident[] {
   if (!svc.components) return list;
   return list.filter((i) => i.affected.some((a) => svc.components!.includes(a)));

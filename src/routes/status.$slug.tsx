@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { getSourceReading } from "@/lib/status.functions";
-import { LEVEL_LABEL, SOURCES, relevantIncidents, serviceLevel, componentLevel, type Level, type Service } from "@/lib/services";
+import { LEVEL_LABEL, SOURCES, relevantIncidents, serviceLevel, componentLevel, componentLabel, type Level, type Service } from "@/lib/services";
 import { STATUS_PAGES, statusPage } from "@/lib/status-pages";
 
 const readingQuery = (source: string) => queryOptions({ queryKey: ["reading", source], queryFn: () => getSourceReading({ data: { source } }), refetchInterval: 60_000, staleTime: 30_000 });
@@ -50,7 +50,7 @@ function StatusPage() {
     { q: `Is ${svc.name} down right now?`, a: `This page shows a live reading from ${src.label}'s official status feed (${src.page}), refreshed every minute. If it says operational but ${svc.name} fails for you, the problem is likely local to your account, network or region.` },
     { q: `Why is ${svc.name} not working for me if the status is operational?`, a: svc.tip },
     { q: `Where is the official ${svc.name} status page?`, a: `${src.label} publishes status at ${src.page}. Signalroom reads its public Statuspage feed and links every incident back to the original.` },
-    { q: `What does ${svc.name} cover on this page?`, a: svc.components?.length ? `${svc.note}. Signalroom tracks these official components: ${svc.components.join(", ")}.` : `${svc.note}. All components on ${src.label}'s status page are included.` },
+    { q: `What does ${svc.name} cover on this page?`, a: svc.components?.length ? `${svc.note}. Signalroom tracks these official components: ${svc.components.map(componentLabel).join(", ")}.` : `${svc.note}. All components on ${src.label}'s status page are included.` },
     { q: `Does Signalroom test ${svc.name} itself?`, a: `No. Signalroom does not run synthetic probes or collect user reports. It only shows what ${src.label} publishes, so an outage appears here once the provider acknowledges it.` },
   ];
   const ld = JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((x) => ({ "@type": "Question", name: x.q, acceptedAnswer: { "@type": "Answer", text: x.a } })) }).replace(/</g, "\\u003c");
@@ -72,7 +72,7 @@ function StatusPage() {
 
       {matched.length > 0 && <section className="mt-10"><h2 className="text-2xl font-bold">{svc.name} components</h2>
         <div className="mt-4 overflow-x-auto rounded-xl border border-border"><table className="w-full text-sm"><thead><tr className="text-left font-mono text-[11px] uppercase text-muted-foreground"><th className="p-3">Component</th><th className="p-3">Status</th></tr></thead>
-          <tbody>{matched.slice(0, 40).map((c) => { const l = componentLevel(c.status); return <tr key={c.name} className="border-t border-border"><td className="p-3">{c.name}</td><td className={`p-3 font-medium ${TONE[l]}`}>{LEVEL_LABEL[l]}</td></tr>; })}</tbody></table></div></section>}
+          <tbody>{matched.slice(0, 40).map((c) => { const l = componentLevel(c.status); return <tr key={c.name} className="border-t border-border"><td className="p-3">{componentLabel(c.name)}</td><td className={`p-3 font-medium ${TONE[l]}`}>{LEVEL_LABEL[l]}</td></tr>; })}</tbody></table></div></section>}
 
       {maint.length > 0 && <section className="mt-10"><h2 className="text-2xl font-bold">Scheduled maintenance</h2><ul className="mt-4 space-y-2 text-sm">{maint.map((m) => <li key={m.id}><a href={m.link} target="_blank" rel="noreferrer" className="hover:text-primary">{m.name}</a> <span className="font-mono text-[11px] text-muted-foreground">{fmt(m.startsAt)} → {fmt(m.endsAt)}</span></li>)}</ul></section>}
 

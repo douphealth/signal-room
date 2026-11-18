@@ -7,7 +7,7 @@ let pending: Promise<Record<string, Reading>> | null = null;
 
 const clip = (t: unknown) => { const v = String(t ?? "").replace(/\s+/g, " ").trim(); return v.length > 500 ? v.slice(0, 497) + "…" : v; };
 
-function inc(i: any, page: string): Incident {
+function inc(i: any, page: string, groups: Map<string, string> = new Map()): Incident {
   const updates = Array.isArray(i.incident_updates) ? i.incident_updates : [];
   const u = updates[0];
   const id = String(i.id);
@@ -18,7 +18,7 @@ function inc(i: any, page: string): Incident {
     status: String(i.status),
     updatedAt: String(i.updated_at ?? i.created_at ?? new Date().toISOString()),
     link: incidentUrl(page, id, i.shortlink),
-    affected: (i.components ?? []).map((c: any) => String(c.name)).slice(0, 16),
+    affected: qualifiedNames(i.components, groups).slice(0, 32),
   };
   if (i.created_at) out.createdAt = String(i.created_at);
   if (u?.body) out.latest = clip(u.body);
@@ -35,13 +35,36 @@ function inc(i: any, page: string): Incident {
   return out;
 }
 
-function normalizeComponents(input: any): { name: string; status: string }[] {
-  const components = new Map<string, { name: string; status: string }>();
+/** Statuspage group containers (e.g. "Fortnite") keyed by id. */
+export function groupNames(input: any): Map<string, string> {
+  const groups = new Map<string, string>();
+  for (const raw of Array.isArray(input) ? input : []) if (raw?.group && raw.id) groups.set(String(raw.id), String(raw.name));
+  return groups;
+}
+
+/** Plain names plus "Group > Name" so one product can be scoped when providers reuse names like "Login". */
+function qualifiedNames(input: any, groups: Map<string, string>): string[] {
+  const out: string[] = [];
   for (const raw of Array.isArray(input) ? input : []) {
     if (raw?.group) continue;
-    const component = { name: String(raw.name), status: String(raw.status) };
+    out.push(String(raw.name));
+    const group = raw?.group_id ? groups.get(String(raw.group_id)) : undefined;
+    if (group) out.push(`${group} > ${String(raw.name)}`);
+  }
+  return [...new Set(out)];
+}
+
+export function normalizeComponents(input: any, groups: Map<string, string> = groupNames(input)): { name: string; status: string }[] {
+  const components = new Map<string, { name: string; status: string }>();
+  const keep = (component: { name: string; status: string }) => {
     const previous = components.get(component.name);
     if (!previous || LEVEL_RANK[componentLevel(component.status)] > LEVEL_RANK[componentLevel(previous.status)]) components.set(component.name, component);
+  };
+  for (const raw of Array.isArray(input) ? input : []) {
+    if (raw?.group) continue;
+    keep({ name: String(raw.name), status: String(raw.status) });
+    const group = raw?.group_id ? groups.get(String(raw.group_id)) : undefined;
+    if (group) keep({ name: `${group} > ${String(raw.name)}`, status: String(raw.status) });
   }
   return [...components.values()];
 }
@@ -53,11 +76,12 @@ export async function fetchOne(source: { url: string; page: string }): Promise<R
     const res = await fetch(source.url, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(8000) });
     if (!res.ok) return { ok: false, fetchedAt, lastAttemptAt: fetchedAt, httpStatus: res.status, components: [], incidents: [], maintenances: [], error: `HTTP ${res.status}` };
     const j: any = await res.json();
+    const groups = groupNames(j.components);
     return {
       ok: true, fetchedAt, lastAttemptAt: fetchedAt, httpStatus: res.status, updatedAt: j.page?.updated_at, indicator: j.status?.indicator, description: j.status?.description,
-      components: normalizeComponents(j.components),
-      incidents: (j.incidents ?? []).slice(0, 12).map((i: any) => inc(i, source.page)),
-      maintenances: (j.scheduled_maintenances ?? []).slice(0, 24).map((i: any) => inc(i, source.page)),
+      components: normalizeComponents(j.components, groups),
+      incidents: (j.incidents ?? []).slice(0, 12).map((i: any) => inc(i, source.page, groups)),
+      maintenances: (j.scheduled_maintenances ?? []).slice(0, 24).map((i: any) => inc(i, source.page, groups)),
       ms: Date.now() - t0,
     };
   } catch (e) {

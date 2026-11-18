@@ -21,7 +21,7 @@ import { Link } from "@tanstack/react-router";
 import { STATUS_PAGES } from "@/lib/status-pages";
 import {
   SERVICES, SOURCES, LEVEL_LABEL, LEVEL_RANK, FEED_FORMAT, componentLevel,
-  serviceLevel, relevantIncidents, groupMaintenances, type Level, type Category,
+  serviceLevel, relevantIncidents, groupMaintenances, displayAffected, type Level, type Category,
   type Service, type Reading, type SourceIncident,
 } from "@/lib/services";
 
@@ -46,7 +46,7 @@ export const Route = createFileRoute("/")({
 const DOT: Record<Level, string> = { operational: "bg-ok text-ok", degraded: "bg-warn text-warn", partial: "bg-partial text-partial", major: "bg-major text-major", maintenance: "bg-maint text-maint", unknown: "bg-unknown text-unknown" };
 const TXT: Record<Level, string> = { operational: "text-ok", degraded: "text-warn", partial: "text-partial", major: "text-major", maintenance: "text-maint", unknown: "text-unknown" };
 const PILL: Record<Level, string> = { operational: "border-ok/20 bg-ok/10", degraded: "border-warn/25 bg-warn/10", partial: "border-partial/25 bg-partial/10", major: "border-major/25 bg-major/10", maintenance: "border-maint/25 bg-maint/10", unknown: "border-border bg-muted" };
-const CATS: ("All" | Category)[] = ["All", "AI", "Developer", "Design", "Work", "Commerce"];
+const CATS: ("All" | Category)[] = ["All", "AI", "Developer", "Design", "Work", "Commerce", "Consumer"];
 const ICONS: Record<string, { path: string }> = {
   openai: siOpenai, claude: siAnthropic, cloudflare: siCloudflare, notion: siNotion,
   figma: siFigma, canva: siCanva, shopify: siShopify, github: siGithub,
@@ -124,7 +124,7 @@ function slackMessage(incident: SourceIncident) {
   return [
     `${severity} *${incident.src}: ${incident.name}*`,
     `Severity: ${incident.impact} · Provider status: ${incident.status.replaceAll("_", " ")}`,
-    `Affected: ${incident.affected.length ? incident.affected.join(", ") : "See the provider incident for current scope"}`,
+    `Affected: ${incident.affected.length ? displayAffected(incident.affected).join(", ") : "See the provider incident for current scope"}`,
     incident.latest ? `Latest official update: ${incident.latest}` : "",
     `Official incident: ${incident.link}`,
   ].filter(Boolean).join("\n");
@@ -430,7 +430,7 @@ function Index() {
                   <span className="flex flex-wrap items-center gap-2"><span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase ${incident.impact === "critical" || incident.impact === "major" ? "bg-major/20 text-major" : incident.impact === "minor" ? "bg-warn/20 text-warn" : "bg-maint/20 text-maint"}`}>{incident.impact}</span><span className="font-mono text-xs text-muted-foreground">{incident.src}</span><span className="font-mono text-[11px] text-muted-foreground">{incident.status.replaceAll("_", " ")} · updated {ago(incident.updatedAt, clock)}</span></span>
                   <span className="mt-2 block font-medium hover:text-primary">{incident.name} <ArrowUpRight className="inline h-3.5 w-3.5" /></span>
                   {incident.latest && <span className="mt-1.5 block max-w-5xl text-sm leading-relaxed text-muted-foreground">{incident.latest}</span>}
-                  {incident.affected.length > 0 && <span className="mt-2 flex flex-wrap gap-1">{incident.affected.map((part) => <span key={part} className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">{part}</span>)}</span>}
+                  {incident.affected.length > 0 && <span className="mt-2 flex flex-wrap gap-1">{displayAffected(incident.affected).map((part) => <span key={part} className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">{part}</span>)}</span>}
                 </a>
                 <button onClick={() => void copyIncident(incident)} className="flex shrink-0 items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground transition hover:border-primary/50 hover:text-foreground"><Copy className="h-3.5 w-3.5" />Copy for Slack</button>
               </div>

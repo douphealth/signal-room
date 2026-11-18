@@ -16,8 +16,8 @@ describe("expanded verified provider catalogue", () => {
   it("preserves unique shareable service IDs and valid provider references", () => {
     expect(new Set(SERVICES.map((service) => service.id)).size).toBe(SERVICES.length);
     for (const service of SERVICES) expect(SOURCES[service.source]).toBeDefined();
-    expect(SERVICES).toHaveLength(68);
-    expect(Object.keys(SOURCES)).toHaveLength(43);
+    expect(SERVICES).toHaveLength(105);
+    expect(Object.keys(SOURCES)).toHaveLength(77);
   });
 
   const fixtures: Record<string, string[]> = publishedComponents;
