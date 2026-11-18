@@ -491,7 +491,7 @@ function Index() {
 
       <footer className="border-t border-border py-8">
         <div className="mx-auto flex max-w-[90rem] flex-wrap justify-between gap-3 px-4 font-mono text-xs text-muted-foreground sm:px-5">
-          <span>Signalroom · independent, not affiliated with any provider</span>
+          <span>Signalroom · independent, not affiliated with any provider · <a href="/privacy" className="hover:text-foreground">Privacy</a></span>
           <span>Shortcuts: <kbd>/</kbd> or <kbd>⌘K</kbd> command · <kbd>r</kbd> refresh · <kbd>i</kbd> issues · <kbd>w</kbd> watchlist · <kbd>n</kbd> NOC</span>
         </div>
       </footer>
