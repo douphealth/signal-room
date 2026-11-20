@@ -79,6 +79,18 @@ export const SOURCES: Record<string, { url: string; page: string; label: string 
   duolingo: {"label": "Duolingo", "url": "https://status.duolingo.com/api/v2/summary.json", "page": "https://status.duolingo.com/"} ,
   vimeo: {"label": "Vimeo", "url": "https://www.vimeostatus.com/api/v2/summary.json", "page": "https://www.vimeostatus.com/"} ,
   medium: {"label": "Medium", "url": "https://status.medium.com/api/v2/summary.json", "page": "https://status.medium.com/"} ,
+  lastpass: {"label": "LastPass", "url": "https://status.lastpass.com/api/v2/summary.json", "page": "https://status.lastpass.com/"},
+  smartsheet: {"label": "Smartsheet", "url": "https://status.smartsheet.com/api/v2/summary.json", "page": "https://status.smartsheet.com/"},
+  snowflake: {"label": "Snowflake", "url": "https://status.snowflake.com/api/v2/summary.json", "page": "https://status.snowflake.com/"},
+  monday: {"label": "monday.com", "url": "https://status.monday.com/api/v2/summary.json", "page": "https://status.monday.com/"},
+  wix: {"label": "Wix", "url": "https://status.wix.com/api/v2/summary.json", "page": "https://status.wix.com/"},
+  onepassword: {"label": "1Password", "url": "https://status.1password.com/api/v2/summary.json", "page": "https://status.1password.com/"},
+  clickup: {"label": "ClickUp", "url": "https://status.clickup.com/api/v2/summary.json", "page": "https://status.clickup.com/"},
+  kahoot: {"label": "Kahoot!", "url": "https://status.kahoot.com/api/v2/summary.json", "page": "https://status.kahoot.com/"},
+  tailscale: {"label": "Tailscale", "url": "https://status.tailscale.com/api/v2/summary.json", "page": "https://status.tailscale.com/"},
+  ngrok: {"label": "ngrok", "url": "https://status.ngrok.com/api/v2/summary.json", "page": "https://status.ngrok.com/"},
+  segment: {"label": "Segment", "url": "https://status.segment.com/api/v2/summary.json", "page": "https://status.segment.com/"},
+  kajabi: {"label": "Kajabi", "url": "https://status.kajabi.com/api/v2/summary.json", "page": "https://status.kajabi.com/"},
 };
 
 export const FEED_FORMAT = "Statuspage JSON · /api/v2/summary.json";
@@ -188,7 +200,19 @@ export const SERVICES: Service[] = [
   {"id": "twitch", "name": "Twitch", "category": "Consumer", "mark": "TW", "source": "twitch", "note": "Live streaming: watching, broadcasting, chat and purchases", "tip": "Separate watching, broadcasting and chat. For streamers, also check your encoder and ingest server."},
   {"id": "duolingo", "name": "Duolingo", "category": "Consumer", "mark": "DL", "source": "duolingo", "note": "Language-learning app and website", "tip": "Compare the app and website. Streak issues during an outage are usually handled by Duolingo support."},
   {"id": "vimeo", "name": "Vimeo", "category": "Consumer", "mark": "VM", "source": "vimeo", "note": "Video hosting, playback, uploads and live", "tip": "Separate playback, upload and live streaming. Embeds can fail because of the host site."},
-  {"id": "medium", "name": "Medium", "category": "Consumer", "mark": "MD", "source": "medium", "note": "Reading, writing and publishing on Medium", "tip": "Compare reading and the editor. Custom-domain publications can fail on DNS alone."}
+  {"id": "medium", "name": "Medium", "category": "Consumer", "mark": "MD", "source": "medium", "note": "Reading, writing and publishing on Medium", "tip": "Compare reading and the editor. Custom-domain publications can fail on DNS alone."},
+  {"id": "lastpass", "name": "LastPass", "category": "Work", "mark": "LP", "source": "lastpass", "note": "Password manager: vault access, sign-in, browser extension and admin console", "tip": "Try the LastPass web vault and the browser extension separately. The status page lists regions (US, Europe, Australia), so check yours."},
+  {"id": "onepassword", "name": "1Password", "category": "Work", "mark": "1P", "source": "onepassword", "note": "Password manager: 1Password.com accounts, sign-in, sync and admin tools", "tip": "If unlock works but sync fails, your saved items are still available offline in the app. Check the region your account is hosted in."},
+  {"id": "smartsheet", "name": "Smartsheet", "category": "Work", "mark": "SM", "source": "smartsheet", "note": "Work management: sheets, notifications, forms and the REST API", "tip": "Separate the web app from email notifications and API integrations; they are listed as different components."},
+  {"id": "monday", "name": "monday.com", "category": "Work", "mark": "MO", "source": "monday", "note": "Work OS: boards, dashboards, automations and integrations", "tip": "If boards load but automations or integrations stall, check those components specifically before assuming a full outage."},
+  {"id": "clickup", "name": "ClickUp", "category": "Work", "mark": "CU", "source": "clickup", "note": "Project management: tasks, docs, automations and ClickUp Brain AI", "tip": "Compare the platform itself with automations and Brain AI, which ClickUp reports as separate components."},
+  {"id": "snowflake", "name": "Snowflake", "category": "Developer", "mark": "SF", "source": "snowflake", "note": "Cloud data platform: warehouses, queries, data loading and Snowsight", "tip": "Snowflake publishes status per cloud provider and region. Match your account's region before assuming an outage."},
+  {"id": "segment", "name": "Segment", "category": "Developer", "mark": "SE", "source": "segment", "note": "Customer data platform: tracking API, Analytics.js CDN and destinations", "tip": "Events can be accepted but delayed downstream. Check ingestion and destination components separately."},
+  {"id": "tailscale", "name": "Tailscale", "category": "Developer", "mark": "TS", "source": "tailscale", "note": "Mesh VPN: coordination service, DERP relays, admin console and API", "tip": "Existing connections can keep working during a coordination-service incident; new logins and key changes are usually affected first."},
+  {"id": "ngrok", "name": "ngrok", "category": "Developer", "mark": "NG", "source": "ngrok", "note": "Tunnels and API gateway: regional edges, dashboard and API", "tip": "ngrok reports each region separately. Try another region flag if only one region is degraded."},
+  {"id": "wix", "name": "Wix", "category": "Commerce", "mark": "WX", "source": "wix", "note": "Website builder: editor, published sites, stores and bookings", "tip": "Check whether visitors can reach your live site or only the editor and dashboard are affected; Wix lists them separately."},
+  {"id": "kajabi", "name": "Kajabi", "category": "Commerce", "mark": "KJ", "source": "kajabi", "note": "Creator platform: courses, checkout, site emails and webhooks", "tip": "Check Offer Checkout first if sales stop. Course access and automated emails are separate components."},
+  {"id": "kahoot", "name": "Kahoot!", "category": "Consumer", "mark": "KA", "source": "kahoot", "note": "Game-based learning: hosting, joining games, login and search", "tip": "If players cannot join, check whether hosting or the join page is affected, and try a different network for school firewalls."},
 ];
 
 export type Level = "operational" | "degraded" | "partial" | "major" | "maintenance" | "unknown";
