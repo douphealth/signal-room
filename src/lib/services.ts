@@ -91,6 +91,16 @@ export const SOURCES: Record<string, { url: string; page: string; label: string 
   ngrok: {"label": "ngrok", "url": "https://status.ngrok.com/api/v2/summary.json", "page": "https://status.ngrok.com/"},
   segment: {"label": "Segment", "url": "https://status.segment.com/api/v2/summary.json", "page": "https://status.segment.com/"},
   kajabi: {"label": "Kajabi", "url": "https://status.kajabi.com/api/v2/summary.json", "page": "https://status.kajabi.com/"},
+  chime: {"label": "Chime", "url": "https://status.chime.com/api/v2/summary.json", "page": "https://status.chime.com/"},
+  cashapp: {"label": "Cash App", "url": "https://status.cash.app/api/v2/summary.json", "page": "https://status.cash.app/"},
+  constantcontact: {"label": "Constant Contact", "url": "https://status.constantcontact.com/api/v2/summary.json", "page": "https://status.constantcontact.com/"},
+  udemy: {"label": "Udemy", "url": "https://status.udemy.com/api/v2/summary.json", "page": "https://status.udemy.com/"},
+  proton: {"label": "Proton", "url": "https://status.proton.me/api/v2/summary.json", "page": "https://status.proton.me/"},
+  activecampaign: {"label": "ActiveCampaign", "url": "https://status.activecampaign.com/api/v2/summary.json", "page": "https://status.activecampaign.com/"},
+  khanacademy: {"label": "Khan Academy", "url": "https://status.khanacademy.org/api/v2/summary.json", "page": "https://status.khanacademy.org/"},
+  hootsuite: {"label": "Hootsuite", "url": "https://status.hootsuite.com/api/v2/summary.json", "page": "https://status.hootsuite.com/"},
+  cryptocom: {"label": "Crypto.com", "url": "https://status.crypto.com/api/v2/summary.json", "page": "https://status.crypto.com/"},
+  descript: {"label": "Descript", "url": "https://status.descript.com/api/v2/summary.json", "page": "https://status.descript.com/"},
 };
 
 export const FEED_FORMAT = "Statuspage JSON · /api/v2/summary.json";
@@ -213,6 +223,16 @@ export const SERVICES: Service[] = [
   {"id": "wix", "name": "Wix", "category": "Commerce", "mark": "WX", "source": "wix", "note": "Website builder: editor, published sites, stores and bookings", "tip": "Check whether visitors can reach your live site or only the editor and dashboard are affected; Wix lists them separately."},
   {"id": "kajabi", "name": "Kajabi", "category": "Commerce", "mark": "KJ", "source": "kajabi", "note": "Creator platform: courses, checkout, site emails and webhooks", "tip": "Check Offer Checkout first if sales stop. Course access and automated emails are separate components."},
   {"id": "kahoot", "name": "Kahoot!", "category": "Consumer", "mark": "KA", "source": "kahoot", "note": "Game-based learning: hosting, joining games, login and search", "tip": "If players cannot join, check whether hosting or the join page is affected, and try a different network for school firewalls."},
+  {"id": "chime", "name": "Chime", "category": "Commerce", "mark": "CH", "source": "chime", "note": "Mobile banking: card purchases, direct deposit, transfers and support", "tip": "Chime lists card purchases, direct deposit and in-app support separately. If only your card is declined, check Card Purchases."},
+  {"id": "cashapp", "name": "Cash App", "category": "Commerce", "mark": "CA", "source": "cashapp", "note": "Payments: send and receive money, Cash App Card, Cash App Pay and direct deposit", "tip": "If a payment is pending, check Send & Receive Money before resending: a second attempt can go through twice once service recovers."},
+  {"id": "constantcontact", "name": "Constant Contact", "category": "Commerce", "mark": "CC", "source": "constantcontact", "note": "Email marketing: campaigns, contacts, SMS and sign-up forms", "tip": "Check whether sending, contact management or the editor is affected; Constant Contact reports them as separate components."},
+  {"id": "activecampaign", "name": "ActiveCampaign", "category": "Commerce", "mark": "AC", "source": "activecampaign", "note": "Marketing automation: email sending, automations, published pages and API", "tip": "Automations can be delayed while the app still loads. Check Email and API Availability separately."},
+  {"id": "hootsuite", "name": "Hootsuite", "category": "Work", "mark": "HS", "source": "hootsuite", "note": "Social media management: web and mobile apps, scheduling and inbox", "tip": "Scheduled posts depend on each social network too. If only one network fails, check that network's own status."},
+  {"id": "descript", "name": "Descript", "category": "AI", "mark": "DE", "source": "descript", "note": "AI audio and video editing: desktop and web apps, transcription and project sync", "tip": "If edits don't sync between devices, check Live Collaboration/Project Sync before re-exporting."},
+  {"id": "proton", "name": "Proton Mail", "category": "Work", "mark": "PM", "source": "proton", "note": "Proton services: Mail, VPN, Drive, Calendar and Pass on one shared status page", "tip": "Proton reports web, mobile and VPN servers separately. If only the VPN fails, try another server before assuming a wider outage."},
+  {"id": "udemy", "name": "Udemy", "category": "Consumer", "mark": "UD", "source": "udemy", "note": "Online courses: the Udemy marketplace and Udemy Business", "tip": "Udemy publishes two components: Udemy.com and Udemy Business. Check the one you use."},
+  {"id": "khanacademy", "name": "Khan Academy", "category": "Consumer", "mark": "KH", "source": "khanacademy", "note": "Free learning platform: lessons, assignments, discussions and mobile apps", "tip": "For classroom assignments, check Assignments specifically; school network filters can also block the site."},
+  {"id": "cryptocom", "name": "Crypto.com", "category": "Commerce", "mark": "CR", "source": "cryptocom", "note": "Crypto exchange and app: buying, trading, API and NFT", "tip": "Check whether buying, the API or login is affected; Crypto.com reports them as separate components."},
 ];
 
 export type Level = "operational" | "degraded" | "partial" | "major" | "maintenance" | "unknown";
