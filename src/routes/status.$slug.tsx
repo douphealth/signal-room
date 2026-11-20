@@ -4,6 +4,8 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { getSourceReading } from "@/lib/status.functions";
 import { LEVEL_LABEL, SOURCES, relevantIncidents, serviceLevel, componentLevel, componentLabel, type Level, type Service } from "@/lib/services";
 import { STATUS_PAGES, statusPage } from "@/lib/status-pages";
+import { OfferSlot } from "@/components/OfferSlot";
+import { PASSWORD_MANAGER_PAGES } from "@/monetize.config";
 
 const readingQuery = (source: string) => queryOptions({ queryKey: ["reading", source], queryFn: () => getSourceReading({ data: { source } }), refetchInterval: 60_000, staleTime: 30_000 });
 
@@ -79,6 +81,8 @@ function StatusPage() {
       <section className="mt-10"><h2 className="text-2xl font-bold">{svc.name} not working? What to try</h2>
         <ol className="mt-4 list-decimal space-y-2 pl-5 text-muted-foreground"><li>{svc.tip}</li><li>Open the official <a href={src.page} target="_blank" rel="noreferrer" className="text-primary">{src.label} status page</a> for the full incident history.</li><li>Try another network or device to rule out a local connection or DNS issue.</li><li>Sign out and back in, or clear the app cache, if only your account is affected.</li></ol>
       </section>
+
+      {PASSWORD_MANAGER_PAGES.has(svc.id) && <OfferSlot id="password-manager" context={svc.name} />}
 
       <section className="mt-10"><h2 className="text-2xl font-bold">Frequently asked questions</h2>
         <div className="mt-4 divide-y divide-border rounded-xl border border-border">{faq.map((x) => <div key={x.q} className="p-5"><h3 className="font-semibold">{x.q}</h3><p className="mt-2 leading-relaxed text-muted-foreground">{x.a}</p></div>)}</div>
