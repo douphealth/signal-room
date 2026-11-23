@@ -84,6 +84,14 @@ if (cfg.amazonTag) {
     /rel="/.test(attrs) ? m.replace(/rel="[^"]*"/, 'rel="sponsored nofollow noopener"') : `<a${attrs} rel="sponsored nofollow noopener">`);
 }
 
+// 4. Reserve icon space: Lucide swaps each <i data-lucide> for an <svg> after load. An empty inline <i>
+// has no size, so the header grew when icons appeared and pushed the page down (CLS 0.18-0.26).
+// Tailwind preflight renders the final svg as display:block, so the placeholder mirrors that box.
+if (html.includes("data-lucide")) {
+  html = html.replace("</head>", `<style>i[data-lucide]{display:block;flex-shrink:0}i[data-lucide]:not([class*="w-"]){width:24px;height:24px}</style>
+</head>`);
+}
+
 mkdirSync(join(root, "src", "home"), { recursive: true });
 writeFileSync(join(root, "src", "home", "home.html"), html);
 rmSync(work, { recursive: true, force: true });
