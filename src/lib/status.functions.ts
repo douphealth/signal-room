@@ -89,9 +89,13 @@ export async function fetchOne(source: { url: string; page: string }): Promise<R
   }
 }
 
-async function loadReadings(): Promise<Record<string, Reading>> {
+// One Worker invocation may make at most 50 subrequests (Cloudflare free plan) and there are ~100 feeds,
+// so the board reads them in SLICES parallel requests to /api/feeds.json — each its own invocation.
+const SLICES = 3;
+const DIRECT_BUDGET = 40; // fallback cap when a slice request fails: stay under 50 with headroom
+
+async function readFeeds(sources: [string, (typeof SOURCES)[string]][]): Promise<(readonly [string, Reading])[]> {
   const entries: (readonly [string, Reading])[] = [];
-  const sources = Object.entries(SOURCES);
   // Six reusable slots keep fast feeds moving without waiting for the slowest in a batch.
   let next = 0;
   await Promise.all(Array.from({ length: Math.min(6, sources.length) }, async () => {
@@ -102,6 +106,36 @@ async function loadReadings(): Promise<Record<string, Reading>> {
       entries.push([key, await fetchOne(source)]);
     }
   }));
+  return entries;
+}
+
+function slice(part: number, of: number): [string, (typeof SOURCES)[string]][] {
+  return Object.entries(SOURCES).filter((_, i) => i % of === part);
+}
+
+/** Readings for one slice of the feeds (served by /api/feeds.json). */
+export async function feedSlice(part: number, of: number): Promise<Record<string, Reading>> {
+  return Object.fromEntries(await readFeeds(slice(part, of))) as Record<string, Reading>;
+}
+
+async function loadReadings(): Promise<Record<string, Reading>> {
+  const origin = "https://signalroom.store";
+  const parts = await Promise.all(Array.from({ length: SLICES }, async (_, part) => {
+    try {
+      const res = await fetch(`${origin}/api/feeds.json?part=${part}&of=${SLICES}`, { signal: AbortSignal.timeout(12_000) });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return Object.entries((await res.json()) as Record<string, Reading>);
+    } catch {
+      return null; // read this slice directly below, within the remaining budget
+    }
+  }));
+  const entries: (readonly [string, Reading])[] = parts.flatMap((p) => p ?? []);
+  const missing = parts.flatMap((p, part) => (p ? [] : slice(part, SLICES)));
+  if (missing.length) {
+    entries.push(...(await readFeeds(missing.slice(0, DIRECT_BUDGET))));
+    const at = new Date().toISOString();
+    for (const [key] of missing.slice(DIRECT_BUDGET)) entries.push([key, { ok: false, fetchedAt: at, components: [], incidents: [], maintenances: [], error: "Not read this cycle" }]);
+  }
   const data = Object.fromEntries(entries) as Record<string, Reading>;
   // Keep the last good reading (clearly flagged) if a feed blips instead of blanking its services.
   if (cache) {

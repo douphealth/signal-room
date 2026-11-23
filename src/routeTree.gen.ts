@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ApiFeedsDotjsonRouteImport } from './routes/api.feeds[.]json'
 import { Route as ApiStatusDotjsonRouteImport } from './routes/api.status[.]json'
 import { Route as StatusSlugRouteImport } from './routes/status.$slug'
 
@@ -36,6 +37,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiFeedsDotjsonRoute = ApiFeedsDotjsonRouteImport.update({
+  id: '/api/feeds.json',
+  path: '/api/feeds.json',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStatusDotjsonRoute = ApiStatusDotjsonRouteImport.update({
   id: '/api/status.json',
   path: '/api/status.json',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/llms.txt': typeof LlmsDottxtRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/feeds.json': typeof ApiFeedsDotjsonRoute
   '/api/status.json': typeof ApiStatusDotjsonRoute
   '/status/$slug': typeof StatusSlugRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/llms.txt': typeof LlmsDottxtRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/feeds.json': typeof ApiFeedsDotjsonRoute
   '/api/status.json': typeof ApiStatusDotjsonRoute
   '/status/$slug': typeof StatusSlugRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/llms.txt': typeof LlmsDottxtRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/feeds.json': typeof ApiFeedsDotjsonRoute
   '/api/status.json': typeof ApiStatusDotjsonRoute
   '/status/$slug': typeof StatusSlugRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/privacy'
     | '/sitemap.xml'
+    | '/api/feeds.json'
     | '/api/status.json'
     | '/status/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/privacy'
     | '/sitemap.xml'
+    | '/api/feeds.json'
     | '/api/status.json'
     | '/status/$slug'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/privacy'
     | '/sitemap.xml'
+    | '/api/feeds.json'
     | '/api/status.json'
     | '/status/$slug'
   fileRoutesById: FileRoutesById
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiFeedsDotjsonRoute: typeof ApiFeedsDotjsonRoute
   ApiStatusDotjsonRoute: typeof ApiStatusDotjsonRoute
   StatusSlugRoute: typeof StatusSlugRoute
 }
@@ -138,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/feeds.json': {
+      id: '/api/feeds.json'
+      path: '/api/feeds.json'
+      fullPath: '/api/feeds.json'
+      preLoaderRoute: typeof ApiFeedsDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/status.json': {
       id: '/api/status.json'
       path: '/api/status.json'
@@ -160,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsDottxtRoute: LlmsDottxtRoute,
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiFeedsDotjsonRoute: ApiFeedsDotjsonRoute,
   ApiStatusDotjsonRoute: ApiStatusDotjsonRoute,
   StatusSlugRoute: StatusSlugRoute,
 }
