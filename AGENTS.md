@@ -32,3 +32,10 @@ use the editor.
 - Service catalogue and status-level logic live in src/lib/services.ts; status feeds are fetched only server-side via src/lib/status.functions.ts (avoids CORS, enables caching).
 - Verify new provider summary feeds and exact scoped component names before listing them; catalogue tests retain published component fixtures to catch unsupported mappings.
 - Aggregate provider feeds through six reusable fetch slots so growing coverage does not stall behind batch boundaries or exceed the runtime connection budget.
+
+## /monitor (hand-made design)
+The stack-monitor workspace at /monitor is a hand-made single-page design: edit `design/home.html`,
+run `node scripts/build-home.mjs`, commit. It is served by `src/home/serve.ts` (PAGE_PATH), reads
+live data from `/api/status.json` (all official feeds, cached) and links services to /status/<id>.
+Never put an index.html in the repo root: Nitro would serve it for every route. Never show estimated
+or generated uptime history — Signalroom only shows live readings and links the vendor's own history.

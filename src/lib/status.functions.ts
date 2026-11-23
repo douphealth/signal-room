@@ -121,9 +121,8 @@ async function loadReadings(): Promise<Record<string, Reading>> {
   return data;
 }
 
-export const getReadings = createServerFn({ method: "GET" }).handler(async () => {
-  // Public provider data only: safe to reuse at the edge and across visitors.
-  setResponseHeader("Cache-Control", "public, max-age=30, stale-while-revalidate=120");
+/** All feeds, shared by the board, /status pages and /api/status.json (45 s in-memory cache, one fetch in flight). */
+export async function boardReadings(): Promise<Record<string, Reading>> {
   if (cache && Date.now() - cache.at < 45_000) return cache.data;
   if (pending) return pending;
   const request = loadReadings();
@@ -133,6 +132,12 @@ export const getReadings = createServerFn({ method: "GET" }).handler(async () =>
   } finally {
     if (pending === request) pending = null;
   }
+}
+
+export const getReadings = createServerFn({ method: "GET" }).handler(async () => {
+  // Public provider data only: safe to reuse at the edge and across visitors.
+  setResponseHeader("Cache-Control", "public, max-age=30, stale-while-revalidate=120");
+  return boardReadings();
 });
 
 const one = new Map<string, { at: number; data: Reading }>();

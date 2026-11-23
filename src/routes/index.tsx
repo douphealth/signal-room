@@ -306,7 +306,9 @@ function Index() {
             <a href="#incidents" className="transition hover:text-foreground">Incidents{incidents.length ? ` (${incidents.length})` : ""}</a>
             <a href="#maintenance" className="transition hover:text-foreground">Maintenance</a>
             <a href="#method" className="transition hover:text-foreground">Feed health</a>
+            <a href="/monitor" className="font-medium text-foreground transition hover:text-primary">Stack monitor</a>
           </nav>
+          <a href="/monitor" className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-foreground transition hover:border-primary lg:hidden">Stack monitor</a>
           <div className="flex items-center gap-2">
             <button onClick={() => setCommandOpen(true)} className="hidden items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition hover:border-primary/50 hover:text-foreground sm:flex" aria-label="Open command menu">
               <Search className="h-3.5 w-3.5" /> Command <kbd className="rounded border border-border px-1 font-mono text-[10px]">⌘K</kbd>
@@ -491,7 +493,7 @@ function Index() {
 
       <footer className="border-t border-border py-8">
         <div className="mx-auto flex max-w-[90rem] flex-wrap justify-between gap-3 px-4 font-mono text-xs text-muted-foreground sm:px-5">
-          <span>Signalroom · independent, not affiliated with any provider · <a href="/privacy" className="hover:text-foreground">Privacy</a></span>
+          <span>Signalroom · independent, not affiliated with any provider · <a href="/monitor" className="hover:text-foreground">Stack monitor</a> · <a href="/privacy" className="hover:text-foreground">Privacy</a></span>
           <span>Shortcuts: <kbd>/</kbd> or <kbd>⌘K</kbd> command · <kbd>r</kbd> refresh · <kbd>i</kbd> issues · <kbd>w</kbd> watchlist · <kbd>n</kbd> NOC</span>
         </div>
       </footer>

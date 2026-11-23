@@ -3,6 +3,7 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { seoPreflight, seoRewrite } from "./lib/seo-edge";
+import { serveHome } from "./home/serve";
 import { withEdgeCache } from "./lib/edge-cache";
 
 type ServerEntry = {
@@ -53,9 +54,11 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const redirect = seoPreflight(request);
     if (redirect) return redirect;
+    const monitor = serveHome(request);
+    if (monitor) return seoRewrite(request, monitor);
     try {
       // Public pages are cached at the edge for 60s (see lib/edge-cache.ts).
-      return await withEdgeCache(request, ctx, { ttl: 60, skip: (p) => p.startsWith("/api/") }, async () => {
+      return await withEdgeCache(request, ctx, { ttl: 60, skip: (p) => p.startsWith("/api/") && p !== "/api/status.json" }, async () => {
         const handler = await getServerEntry();
         const response = await handler.fetch(request, env, ctx);
         return seoRewrite(request, await normalizeCatastrophicSsrResponse(response));
