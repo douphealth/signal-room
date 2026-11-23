@@ -57,8 +57,9 @@ export default {
     const monitor = serveHome(request);
     if (monitor) return seoRewrite(request, monitor);
     try {
-      // Public pages are cached at the edge for 60s (see lib/edge-cache.ts).
-      return await withEdgeCache(request, ctx, { ttl: 60, skip: (p) => p.startsWith("/api/") && p !== "/api/status.json" }, async () => {
+      // Public pages: fresh for 60s, then served instantly while re-rendering for up to 15 min
+      // (the page refetches live readings on load anyway). See lib/edge-cache.ts.
+      return await withEdgeCache(request, ctx, { ttl: 60, swr: 900, skip: (p) => p.startsWith("/api/") && p !== "/api/status.json" }, async () => {
         const handler = await getServerEntry();
         const response = await handler.fetch(request, env, ctx);
         return seoRewrite(request, await normalizeCatastrophicSsrResponse(response));
