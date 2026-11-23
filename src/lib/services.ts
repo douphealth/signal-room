@@ -101,6 +101,19 @@ export const SOURCES: Record<string, { url: string; page: string; label: string 
   hootsuite: {"label": "Hootsuite", "url": "https://status.hootsuite.com/api/v2/summary.json", "page": "https://status.hootsuite.com/"},
   cryptocom: {"label": "Crypto.com", "url": "https://status.crypto.com/api/v2/summary.json", "page": "https://status.crypto.com/"},
   descript: {"label": "Descript", "url": "https://status.descript.com/api/v2/summary.json", "page": "https://status.descript.com/"},
+  buildkite: {"label": "Buildkite", "url": "https://www.buildkitestatus.com/api/v2/summary.json", "page": "https://www.buildkitestatus.com/"} ,
+  hashicorp: {"label": "HashiCorp Cloud", "url": "https://status.hashicorp.com/api/v2/summary.json", "page": "https://status.hashicorp.com/"} ,
+  launchdarkly: {"label": "LaunchDarkly", "url": "https://status.launchdarkly.com/api/v2/summary.json", "page": "https://status.launchdarkly.com/"} ,
+  cockroachdb: {"label": "CockroachDB Cloud", "url": "https://status.cockroachlabs.cloud/api/v2/summary.json", "page": "https://status.cockroachlabs.cloud/"} ,
+  grafana: {"label": "Grafana Cloud", "url": "https://status.grafana.com/api/v2/summary.json", "page": "https://status.grafana.com/"} ,
+  honeycomb: {"label": "Honeycomb", "url": "https://status.honeycomb.io/api/v2/summary.json", "page": "https://status.honeycomb.io/"} ,
+  opsgenie: {"label": "Opsgenie", "url": "https://opsgenie.status.atlassian.com/api/v2/summary.json", "page": "https://opsgenie.status.atlassian.com/"} ,
+  workos: {"label": "WorkOS", "url": "https://status.workos.com/api/v2/summary.json", "page": "https://status.workos.com/"} ,
+  snyk: {"label": "Snyk", "url": "https://status.snyk.io/api/v2/summary.json", "page": "https://status.snyk.io/"} ,
+  sendgrid: {"label": "SendGrid", "url": "https://status.sendgrid.com/api/v2/summary.json", "page": "https://status.sendgrid.com/"} ,
+  pusher: {"label": "Pusher", "url": "https://status.pusher.com/api/v2/summary.json", "page": "https://status.pusher.com/"} ,
+  ably: {"label": "Ably", "url": "https://status.ably.com/api/v2/summary.json", "page": "https://status.ably.com/"} ,
+  mixpanel: {"label": "Mixpanel", "url": "https://status.mixpanel.com/api/v2/summary.json", "page": "https://status.mixpanel.com/"} ,
 };
 
 export const FEED_FORMAT = "Statuspage JSON · /api/v2/summary.json";
@@ -233,6 +246,19 @@ export const SERVICES: Service[] = [
   {"id": "udemy", "name": "Udemy", "category": "Consumer", "mark": "UD", "source": "udemy", "note": "Online courses: the Udemy marketplace and Udemy Business", "tip": "Udemy publishes two components: Udemy.com and Udemy Business. Check the one you use."},
   {"id": "khanacademy", "name": "Khan Academy", "category": "Consumer", "mark": "KH", "source": "khanacademy", "note": "Free learning platform: lessons, assignments, discussions and mobile apps", "tip": "For classroom assignments, check Assignments specifically; school network filters can also block the site."},
   {"id": "cryptocom", "name": "Crypto.com", "category": "Commerce", "mark": "CR", "source": "cryptocom", "note": "Crypto exchange and app: buying, trading, API and NFT", "tip": "Check whether buying, the API or login is affected; Crypto.com reports them as separate components."},
+  {"id": "buildkite", "name": "Buildkite", "category": "Developer", "mark": "BK", "source": "buildkite", "note": "CI/CD pipelines, agents and the Buildkite web app", "tip": "If builds sit in 'scheduled', check that your self-hosted agents are connected before assuming a Buildkite outage."},
+  {"id": "hashicorp", "name": "HashiCorp Cloud", "category": "Developer", "mark": "HC", "source": "hashicorp", "note": "HCP Terraform, Vault, Packer and other HashiCorp cloud services", "tip": "Terraform runs can fail on provider APIs too: compare the error with your cloud provider's status before retrying."},
+  {"id": "launchdarkly", "name": "LaunchDarkly", "category": "Developer", "mark": "LD", "source": "launchdarkly", "note": "Feature flags: flag delivery, streaming updates and the dashboard", "tip": "SDKs keep serving cached flag values during an outage; check whether only dashboard changes are delayed."},
+  {"id": "cockroachdb", "name": "CockroachDB Cloud", "category": "Developer", "mark": "CR", "source": "cockroachdb", "note": "Managed CockroachDB clusters, console and cloud API", "tip": "Check the region of your cluster in the component list: incidents are often limited to one cloud region."},
+  {"id": "grafana", "name": "Grafana Cloud", "category": "Developer", "mark": "GR", "source": "grafana", "note": "Grafana Cloud dashboards, metrics, logs, traces and alerting", "tip": "If dashboards load but panels are empty, check the Metrics, Logs or Traces components for your region."},
+  {"id": "honeycomb", "name": "Honeycomb", "category": "Developer", "mark": "HY", "source": "honeycomb", "note": "Observability: event ingest, queries and triggers", "tip": "Missing recent events can be ingest delay: compare ingest and query components before changing instrumentation."},
+  {"id": "opsgenie", "name": "Opsgenie", "category": "Developer", "mark": "OG", "source": "opsgenie", "note": "On-call alerting, notifications and schedules", "tip": "If alerts are not arriving, check the notification channel component (SMS, voice, push, email) that you rely on."},
+  {"id": "workos", "name": "WorkOS", "category": "Developer", "mark": "WO", "source": "workos", "note": "Enterprise SSO, directory sync and user management APIs", "tip": "SSO failures can come from the customer's identity provider: check its status as well as WorkOS."},
+  {"id": "snyk", "name": "Snyk", "category": "Developer", "mark": "SN", "source": "snyk", "note": "Security scanning: CLI, IDE, SCM integrations and the web app", "tip": "If CLI scans fail, retry with --debug to see whether the API or your network proxy is the cause."},
+  {"id": "sendgrid", "name": "SendGrid", "category": "Developer", "mark": "SG", "source": "sendgrid", "note": "Email API, SMTP relay, delivery and event webhooks", "tip": "Delayed emails are not always an outage: check the Mail Sending and Event Webhook components and your activity feed."},
+  {"id": "pusher", "name": "Pusher", "category": "Developer", "mark": "PU", "source": "pusher", "note": "Realtime Channels and Beams push notifications", "tip": "Check the cluster your app uses (for example mt1 or eu) in the component list."},
+  {"id": "ably", "name": "Ably", "category": "Developer", "mark": "AB", "source": "ably", "note": "Realtime messaging: pub/sub, presence and push", "tip": "Ably fails over between regions automatically; check whether only one region is affected."},
+  {"id": "mixpanel", "name": "Mixpanel", "category": "Developer", "mark": "MX", "source": "mixpanel", "note": "Product analytics: event ingestion, reports and exports", "tip": "Events may arrive late during ingestion delays and appear later without being lost; check the ingestion component first."}
 ];
 
 export type Level = "operational" | "degraded" | "partial" | "major" | "maintenance" | "unknown";

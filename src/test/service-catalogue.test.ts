@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { SERVICES, SOURCES, relevantIncidents, serviceLevel, type Reading, type Incident } from "@/lib/services";
 import publishedComponents from "./provider-components.fixture.json";
 
-const newProviders = ["cursor", "deepgram", "netlify", "flyio", "planetscale", "upstash", "clerk", "sentry", "npm", "docker", "circleci", "bitbucket", "linear", "jira", "confluence", "trello", "asana", "zoom", "dropbox", "twilio", "resend", "mailgun", "cloudinary", "webflow", "zapier", "plaid", "mongodb", "reddit", "pinecone", "replit"];
+const newProviders = ["cursor", "deepgram", "netlify", "flyio", "planetscale", "upstash", "clerk", "sentry", "npm", "docker", "circleci", "bitbucket", "linear", "jira", "confluence", "trello", "asana", "zoom", "dropbox", "twilio", "resend", "mailgun", "cloudinary", "webflow", "zapier", "plaid", "mongodb", "reddit", "pinecone", "replit", "buildkite", "hashicorp", "launchdarkly", "cockroachdb", "grafana", "honeycomb", "opsgenie", "workos", "snyk", "sendgrid", "pusher", "ably", "mixpanel"];
 
 describe("expanded verified provider catalogue", () => {
   it.each(newProviders)("offers %s with its official HTTPS summary feed", (key) => {
@@ -16,8 +16,8 @@ describe("expanded verified provider catalogue", () => {
   it("preserves unique shareable service IDs and valid provider references", () => {
     expect(new Set(SERVICES.map((service) => service.id)).size).toBe(SERVICES.length);
     for (const service of SERVICES) expect(SOURCES[service.source]).toBeDefined();
-    expect(SERVICES).toHaveLength(127);
-    expect(Object.keys(SOURCES)).toHaveLength(99);
+    expect(SERVICES).toHaveLength(140);
+    expect(Object.keys(SOURCES)).toHaveLength(112);
   });
 
   const fixtures: Record<string, string[]> = publishedComponents;
