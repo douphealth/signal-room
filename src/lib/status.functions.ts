@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { setResponseHeader } from "@tanstack/react-start/server";
-import { SOURCES, LEVEL_RANK, componentLevel, incidentUrl, parseMaintenanceWindow, type Reading, type Incident } from "./services";
+import { SOURCES, LEVEL_RANK, componentLevel, incidentUrl, parseMaintenanceWindow, type Reading, type Incident, type PastIncident } from "./services";
 
 let cache: { at: number; data: Record<string, Reading> } | null = null;
 let pending: Promise<Record<string, Reading>> | null = null;
@@ -190,4 +190,43 @@ export const getSourceReading = createServerFn({ method: "GET" })
     const reading: Reading = !r.ok && hit?.data.ok ? { ...hit.data, stale: true, lastAttemptAt: r.lastAttemptAt ?? r.fetchedAt } : r;
     one.set(data.source, { at: Date.now(), data: reading });
     return reading;
+  });
+
+/** Provider incident history: Statuspage's last 25–50 incidents, resolved ones included. */
+export function pastIncident(i: any, page: string, groups: Map<string, string>): PastIncident {
+  const updates: any[] = Array.isArray(i.incident_updates) ? i.incident_updates : [];
+  const resolvedUpdate = updates.find((u) => u?.status === "resolved" || u?.status === "postmortem");
+  const done = i.status === "resolved" || i.status === "postmortem" || i.status === "completed";
+  const out: PastIncident = {
+    id: String(i.id),
+    name: clip(i.name),
+    impact: String(i.impact ?? "none"),
+    status: String(i.status),
+    startedAt: String(i.started_at ?? i.created_at),
+    link: incidentUrl(page, String(i.id), i.shortlink),
+    affected: qualifiedNames(i.components, groups).slice(0, 32),
+  };
+  const resolved = i.resolved_at ?? resolvedUpdate?.created_at ?? (done ? i.updated_at : undefined);
+  if (resolved) out.resolvedAt = String(resolved);
+  return out;
+}
+
+const history = new Map<string, { at: number; data: { ok: boolean; fetchedAt: string; items: PastIncident[] } }>();
+export const getSourceHistory = createServerFn({ method: "GET" })
+  .inputValidator((d: { source: string }) => {
+    if (!d || typeof d.source !== "string" || !Object.hasOwn(SOURCES, d.source)) throw new Error("Unknown source");
+    return d;
+  })
+  .handler(async ({ data }) => {
+    setResponseHeader("Cache-Control", "public, max-age=600, stale-while-revalidate=3600");
+    const hit = history.get(data.source);
+    if (hit && Date.now() - hit.at < 600_000) return hit.data;
+    const src = SOURCES[data.source]!;
+    const get = (u: string) => fetch(u, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(8000) }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    const [list, summary]: any[] = await Promise.all([get(src.url.replace(/summary\.json$/, "incidents.json")), get(src.url)]);
+    if (!list || !Array.isArray(list.incidents)) return hit?.data ?? { ok: false, fetchedAt: new Date().toISOString(), items: [] };
+    const groups = groupNames(summary?.components);
+    const result = { ok: true, fetchedAt: new Date().toISOString(), items: list.incidents.slice(0, 50).map((i: any) => pastIncident(i, src.page, groups)) };
+    history.set(data.source, { at: Date.now(), data: result });
+    return result;
   });

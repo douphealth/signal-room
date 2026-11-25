@@ -366,3 +366,50 @@ export function groupMaintenances(list: SourceIncident[]): MaintenanceGroup[] {
   }
   return [...groups.values()];
 }
+
+/** A resolved or ongoing incident from the provider's published history (Statuspage /api/v2/incidents.json). */
+export interface PastIncident { id: string; name: string; impact: string; status: string; startedAt: string; resolvedAt?: string | undefined; link: string; affected: string[] }
+
+/**
+ * Incidents in a provider's history that concern this service.
+ * Scoped services keep only incidents naming one of their components. When the provider's feed
+ * never says which components an incident affected (e.g. OpenAI's), every incident is kept and
+ * `unscoped` is true so the page can say so instead of pretending the service had none.
+ */
+export function historyFor(svc: Service, list: PastIncident[]): { items: PastIncident[]; unscoped: boolean } {
+  if (!svc.components) return { items: list, unscoped: false };
+  if (!list.some((i) => i.affected.length)) return { items: list, unscoped: list.length > 0 };
+  return { items: list.filter((i) => i.affected.some((a) => svc.components!.includes(a))), unscoped: false };
+}
+
+export const incidentMinutes = (i: PastIncident): number | undefined => {
+  if (!i.resolvedAt) return undefined;
+  const m = (Date.parse(i.resolvedAt) - Date.parse(i.startedAt)) / 60_000;
+  return Number.isFinite(m) && m >= 0 ? Math.round(m) : undefined;
+};
+
+export function fmtDuration(min: number): string {
+  if (min < 1) return "under 1m";
+  if (min < 60) return `${min}m`;
+  const d = Math.floor(min / 1440), h = Math.floor((min % 1440) / 60), m = min % 60;
+  return d ? `${d}d ${h}h` : m ? `${h}h ${m}m` : `${h}h`;
+}
+
+export interface HistoryStats { total: number; last30: number; last90: number; last: PastIncident | undefined; medianMinutes: number | undefined; since: string | undefined; major: number }
+
+/** Counts over the published window. `since` is the oldest incident shown, so pages never overstate coverage. */
+export function historyStats(items: PastIncident[], nowMs: number): HistoryStats {
+  const sorted = [...items].sort((a, b) => Date.parse(b.startedAt) - Date.parse(a.startedAt));
+  const age = (i: PastIncident) => (nowMs - Date.parse(i.startedAt)) / 86_400_000;
+  const mins = sorted.map(incidentMinutes).filter((m): m is number => m !== undefined).sort((a, b) => a - b);
+  const median = mins.length ? (mins.length % 2 ? mins[(mins.length - 1) / 2]! : Math.round((mins[mins.length / 2 - 1]! + mins[mins.length / 2]!) / 2)) : undefined;
+  return {
+    total: sorted.length,
+    last30: sorted.filter((i) => age(i) <= 30).length,
+    last90: sorted.filter((i) => age(i) <= 90).length,
+    last: sorted[0],
+    medianMinutes: median,
+    since: sorted.at(-1)?.startedAt,
+    major: sorted.filter((i) => i.impact === "major" || i.impact === "critical").length,
+  };
+}
