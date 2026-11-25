@@ -395,16 +395,25 @@ export function fmtDuration(min: number): string {
   return d ? `${d}d ${h}h` : m ? `${h}h ${m}m` : `${h}h`;
 }
 
-export interface HistoryStats { total: number; last30: number; last90: number; last: PastIncident | undefined; medianMinutes: number | undefined; since: string | undefined; major: number }
+export interface HistoryStats { total: number; last30: number; last90: number; exact30: boolean; exact90: boolean; last: PastIncident | undefined; medianMinutes: number | undefined; since: string | undefined; major: number }
 
-/** Counts over the published window. `since` is the oldest incident shown, so pages never overstate coverage. */
-export function historyStats(items: PastIncident[], nowMs: number): HistoryStats {
+/**
+ * Counts over the published window. Feeds return a capped list (25 or 50), so when the provider's
+ * oldest returned incident is newer than a window's start, that window's count is only a lower bound
+ * (`exact30`/`exact90` false). `feed` is the provider's full, unfiltered list.
+ */
+export function historyStats(items: PastIncident[], nowMs: number, feed: PastIncident[] = items): HistoryStats {
   const sorted = [...items].sort((a, b) => Date.parse(b.startedAt) - Date.parse(a.startedAt));
   const age = (i: PastIncident) => (nowMs - Date.parse(i.startedAt)) / 86_400_000;
   const mins = sorted.map(incidentMinutes).filter((m): m is number => m !== undefined).sort((a, b) => a - b);
   const median = mins.length ? (mins.length % 2 ? mins[(mins.length - 1) / 2]! : Math.round((mins[mins.length / 2 - 1]! + mins[mins.length / 2]!) / 2)) : undefined;
+  const capped = feed.length >= 25;
+  const feedOldest = Math.min(...feed.map((i) => Date.parse(i.startedAt)).filter(Number.isFinite));
+  const reach = Number.isFinite(feedOldest) ? (nowMs - feedOldest) / 86_400_000 : Infinity;
   return {
     total: sorted.length,
+    exact30: !capped || reach >= 30,
+    exact90: !capped || reach >= 90,
     last30: sorted.filter((i) => age(i) <= 30).length,
     last90: sorted.filter((i) => age(i) <= 90).length,
     last: sorted[0],

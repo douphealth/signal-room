@@ -36,3 +36,13 @@ describe("outage history", () => {
     expect([fmtDuration(0), fmtDuration(45), fmtDuration(72), fmtDuration(120), fmtDuration(3000)]).toEqual(["under 1m", "45m", "1h 12m", "2h", "2d 2h"]);
   });
 });
+
+describe("history coverage", () => {
+  it("marks window counts as lower bounds when a capped feed does not reach back far enough", () => {
+    const feed = Array.from({ length: 25 }, (_, k) => p(`i${k}`, new Date(now - (k + 1) * 86_400_000).toISOString(), undefined, []));
+    const s = historyStats(feed, now, feed);
+    expect([s.exact30, s.exact90]).toEqual([false, false]);
+    const short = historyStats(feed.slice(0, 3), now, feed.slice(0, 3));
+    expect([short.exact30, short.exact90]).toEqual([true, true]);
+  });
+});

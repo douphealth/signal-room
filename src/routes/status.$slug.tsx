@@ -14,7 +14,7 @@ const day = (iso?: string) => (iso ? new Date(iso).toLocaleDateString("en-GB", {
 /** Per-page history summary, shared by head() and the page so both say the same thing. */
 function summarize(svc: Service, h: { ok: boolean; fetchedAt: string; items: PastIncident[] }) {
   const { items, unscoped } = historyFor(svc, h.ok ? h.items : []);
-  return { ok: h.ok, unscoped, items, stats: historyStats(items, Date.parse(h.fetchedAt)) };
+  return { ok: h.ok, unscoped, items, stats: historyStats(items, Date.parse(h.fetchedAt), h.ok ? h.items : []) };
 }
 
 export const Route = createFileRoute("/status/$slug")({
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/status/$slug")({
     if (!svc) throw notFound();
     const [, h] = await Promise.all([context.queryClient.ensureQueryData(readingQuery(svc.source)), context.queryClient.ensureQueryData(historyQuery(svc.source))]);
     const { ok, stats } = summarize(svc, h);
-    const last = ok && stats.last ? { date: day(stats.last.startedAt), last90: stats.last90 } : null;
+    const last = ok && stats.last ? { date: day(stats.last.startedAt), recent: stats.exact90 ? `${stats.last90} in the past 90 days` : stats.exact30 ? `${stats.last30} in the past 30 days` : "" } : null;
     return { slug: svc.id, last };
   },
   head: ({ loaderData }) => {
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/status/$slug")({
     const last = loaderData?.last;
     const t = `Is ${svc.name} down? Live status & outage history | Signalroom`;
     const d = last
-      ? `Is ${svc.name} down right now? Live from ${src.label}'s official status feed, refreshed every minute. Last incident ${last.date}; ${last.last90} in the past 90 days, with durations.`
+      ? `Is ${svc.name} down right now? Live from ${src.label}'s official status feed, refreshed every minute. Last incident ${last.date}${last.recent ? `; ${last.recent}` : ""}, with durations.`
       : `Is ${svc.name} down right now? Live reading from ${src.label}'s official status feed, refreshed every minute, with active incidents, affected components and what to try next.`;
     return { meta: [{ title: t }, { name: "description", content: d }, { property: "og:title", content: `Is ${svc.name} down?` }, { property: "og:description", content: d }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] };
   },
@@ -72,7 +72,7 @@ function StatusPage() {
     { q: `What does ${svc.name} cover on this page?`, a: svc.components?.length ? `${svc.note}. Signalroom tracks these official components: ${svc.components.map(componentLabel).join(", ")}.` : `${svc.note}. All components on ${src.label}'s status page are included.` },
     ...(hist.ok && st.last ? [
       { q: `When was the last ${svc.name} outage?`, a: `The most recent ${who} incident on ${src.label}'s status page started ${day(st.last.startedAt)}: "${st.last.name}" (impact: ${st.last.impact}${incidentMinutes(st.last) !== undefined ? `, resolved after ${fmtDuration(incidentMinutes(st.last)!)}` : st.last.resolvedAt ? "" : ", not yet resolved"}).${hist.unscoped ? ` ${src.label}'s feed does not say which products each incident affected, so this may not have involved ${svc.name}.` : ""}` },
-      { q: `How often does ${svc.name} go down?`, a: `${src.label} published ${st.last90} ${who} incident${st.last90 === 1 ? "" : "s"} in the past 90 days and ${st.last30} in the past 30. Across the ${st.total} most recent (since ${day(st.since)}), ${st.major} had major or critical impact${st.medianMinutes !== undefined ? ` and the median time to resolution was ${fmtDuration(st.medianMinutes)}` : ""}. Most incidents are partial, affecting one feature or region rather than the whole service.` },
+      { q: `How often does ${svc.name} go down?`, a: `${src.label} published ${st.exact90 ? "" : "at least "}${st.last90} ${who} incident${st.last90 === 1 ? "" : "s"} in the past 90 days and ${st.exact30 ? "" : "at least "}${st.last30} in the past 30${st.exact90 ? "" : ` (its public feed only lists incidents back to ${day(st.since)})`}. Across the ${st.total} most recent (since ${day(st.since)}), ${st.major} had major or critical impact${st.medianMinutes !== undefined ? ` and the median time to resolution was ${fmtDuration(st.medianMinutes)}` : ""}. Most incidents are partial, affecting one feature or region rather than the whole service.` },
     ] : []),
     { q: `Does Signalroom test ${svc.name} itself?`, a: `No. Signalroom does not run synthetic probes or collect user reports. It only shows what ${src.label} publishes, so an outage appears here once the provider acknowledges it.` },
   ];
@@ -104,8 +104,8 @@ function StatusPage() {
           <p className="mt-2 text-sm text-muted-foreground">From {src.label}'s published incident history: the {st.total} most recent {who} incidents, back to {day(st.since)}.{hist.unscoped ? ` ${src.label}'s feed does not say which products each incident affected, so these cover all of ${src.label}, not only ${svc.name}.` : ""}</p>
           <dl className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
             <div className="rounded-xl border border-border p-4"><dt className="font-mono text-[11px] uppercase text-muted-foreground">Last incident</dt><dd className="mt-1 text-lg font-semibold">{day(st.last?.startedAt)}</dd></div>
-            <div className="rounded-xl border border-border p-4"><dt className="font-mono text-[11px] uppercase text-muted-foreground">Past 30 days</dt><dd className="mt-1 text-lg font-semibold">{st.last30}</dd></div>
-            <div className="rounded-xl border border-border p-4"><dt className="font-mono text-[11px] uppercase text-muted-foreground">Past 90 days</dt><dd className="mt-1 text-lg font-semibold">{st.last90}</dd></div>
+            <div className="rounded-xl border border-border p-4"><dt className="font-mono text-[11px] uppercase text-muted-foreground">Past 30 days</dt><dd className="mt-1 text-lg font-semibold">{st.last30}{st.exact30 ? "" : "+"}</dd></div>
+            <div className="rounded-xl border border-border p-4"><dt className="font-mono text-[11px] uppercase text-muted-foreground">Past 90 days</dt><dd className="mt-1 text-lg font-semibold">{st.last90}{st.exact90 ? "" : "+"}</dd></div>
             <div className="rounded-xl border border-border p-4"><dt className="font-mono text-[11px] uppercase text-muted-foreground">Median fix time</dt><dd className="mt-1 text-lg font-semibold">{st.medianMinutes !== undefined ? fmtDuration(st.medianMinutes) : "—"}</dd></div>
           </dl>
           <div className="mt-4 overflow-x-auto rounded-xl border border-border"><table className="w-full text-sm"><thead><tr className="text-left font-mono text-[11px] uppercase text-muted-foreground"><th className="p-3">Started (UTC)</th><th className="p-3">Incident</th><th className="p-3">Impact</th><th className="p-3">Duration</th></tr></thead>
